@@ -1,0 +1,1926 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brexbin - Find Your Perfect Part-Time Job</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#1E40AF',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <h1 class="text-2xl font-bold text-primary">Brexbin</h1>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+    <button id="navHomeBtn" onclick="showSection('home')" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Home</button>
+    <button id="navPaymentBtn" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+        <a href="payment.html">Payment</a>
+    </button>
+    <button id="navJobsBtn" onclick="showSection('jobs')" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Browse Jobs</button>
+    <button id="navPostBtn" onclick="showSection('post')" class="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-secondary">Post a Job</button>
+    <button id="navProfileBtn" onclick="showProfile()" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Profile</button>
+    <button id="navGroupChatBtn" onclick="window.location.href='groupchat.html'" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Group Chat</button>
+    <button id="navNotificationBtn" onclick="toggleNotifications()" class="relative text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM19 12H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v5a2 2 0 01-2 2z"/>
+        </svg>
+        <span id="notificationDot" class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full hidden"></span>
+    </button>
+</div>
+    </div>
+</nav>
+    <!-- Admin Dashboard -->
+<div id="adminDashboard" class="section hidden">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <h2 class="text-3xl font-bold text-primary mb-6">Admin Dashboard</h2>
+        <button onclick="muteUser('${u.email}')" class="bg-yellow-500 text-white px-2 py-1 rounded text-xs">Mute</button>
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-2">All Users</h3>
+            <ul id="adminUserList" class="mb-6 bg-white rounded shadow p-4"></ul>
+        </div>
+        <div>
+            <h3 class="text-xl font-semibold mb-2">All Jobs</h3>
+            <ul id="adminJobList" class="bg-white rounded shadow p-4"></ul>
+        </div>
+        <div id="adminDashboard" class="section hidden">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+         
+    </div>
+</div>
+    </div>
+</div>
+
+    <!-- Notification Panel -->
+    <div id="notificationPanel" class="fixed top-16 right-4 w-80 bg-white rounded-xl shadow-2xl border border-primary/20 z-50 hidden transition-all">
+        <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+            <span class="font-bold text-primary text-lg">Notifications</span>
+            <button onclick="toggleNotifications()" class="text-gray-400 hover:text-primary">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div id="notificationList" class="max-h-64 overflow-y-auto p-4 space-y-3">
+            
+        </div>
+    </div>
+
+    <!-- Home Section -->
+    <div id="home" class="section">
+        <!-- Hero Section -->
+        <div class="bg-gradient-to-r from-primary to-secondary text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                <div class="text-center">
+                    <h2 class="text-4xl font-extrabold sm:text-5xl">
+                        Find Student-Friendly Jobs
+                    </h2>
+                    <p class="mt-4 text-xl">
+                        Connect with flexible opportunities that fit your schedule and help you earn while you learn
+                    </p>
+                    <div class="mt-8">
+                        <button onclick="showSection('jobs')" class="bg-white text-primary px-8 py-3 rounded-lg text-lg font-medium hover:bg-gray-100 transform hover:scale-105 transition-all">
+                            Browse Jobs Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h3 class="text-3xl font-extrabold text-gray-900">Why Choose Brexbin?</h3>
+                </div>
+                <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="text-center p-6">
+                        <div class="bg-primary rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-900">Flexible Hours</h4>
+                        <p class="mt-2 text-gray-600">Jobs that work around your class schedule</p>
+                    </div>
+                    <div class="text-center p-6">
+                        <div class="bg-primary rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-900">Fair Pay</h4>
+                        <p class="mt-2 text-gray-600">Competitive wages for student positions</p>
+                    </div>
+                    <div class="text-center p-6">
+                        <div class="bg-primary rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-900">Quick Apply</h4>
+                        <p class="mt-2 text-gray-600">Simple application process</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Calendar Section -->
+    <div id="calendar" class="section hidden">
+        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Calendar</h2>
+                <div class="flex justify-between items-center mb-4">
+                    <button id="prevMonth" class="bg-primary text-white px-3 py-1 rounded hover:bg-secondary">&lt;</button>
+                    <div id="calendarMonthLabel" class="font-semibold text-lg"></div>
+                    <button id="nextMonth" class="bg-primary text-white px-3 py-1 rounded hover:bg-secondary">&gt;</button>
+                </div>
+                <div id="calendarContainer"></div>
+                <div class="mt-6">
+                    <h3 class="text-lg font-semibold mb-2">Add Event</h3>
+                    <form id="eventForm" class="flex flex-col gap-2 md:flex-row md:items-end md:gap-4" onsubmit="addCalendarEvent(event)">
+                        <input type="date" id="eventDate" required class="border border-gray-300 rounded px-2 py-1">
+                        <input type="text" id="eventTitle" placeholder="Event Title" required class="border border-gray-300 rounded px-2 py-1 flex-1">
+                        <button type="submit" class="bg-primary text-white px-4 py-1 rounded hover:bg-secondary">Add</button>
+                    </form>
+                    <div id="eventList" class="mt-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Calendar State
+        let calendarState = {
+            year: new Date().getFullYear(),
+            month: new Date().getMonth()
+        };
+
+        function getCalendarEvents() {
+            return JSON.parse(localStorage.getItem('calendarEvents') || '[]');
+        }
+        function setCalendarEvents(events) {
+            localStorage.setItem('calendarEvents', JSON.stringify(events));
+        }
+
+        function renderCalendar() {
+            const container = document.getElementById('calendarContainer');
+            const label = document.getElementById('calendarMonthLabel');
+            const { year, month } = calendarState;
+            const today = new Date();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const events = getCalendarEvents();
+
+            label.textContent = new Date(year, month).toLocaleString('default', { month: 'long', year: 'numeric' });
+
+            let html = `<div class="grid grid-cols-7 gap-2 text-center mb-2">
+                            <div class="font-bold">Sun</div>
+                            <div class="font-bold">Mon</div>
+                            <div class="font-bold">Tue</div>
+                            <div class="font-bold">Wed</div>
+                            <div class="font-bold">Thu</div>
+                            <div class="font-bold">Fri</div>
+                            <div class="font-bold">Sat</div>
+                        </div>`;
+            html += `<div class="grid grid-cols-7 gap-2 text-center">`;
+
+            // Empty cells for days before the 1st
+            for (let i = 0; i < firstDay; i++) {
+                html += `<div></div>`;
+            }
+            // Days of the month
+            for (let d = 1; d <= daysInMonth; d++) {
+                const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const dayEvents = events.filter(ev => ev.date === dateStr);
+                html += `<div class="py-2 rounded-md cursor-pointer ${isToday ? 'bg-primary text-white font-bold' : 'bg-gray-100 hover:bg-primary/10'}" onclick="showDayEvents('${dateStr}')">
+                            ${d}
+                            ${dayEvents.length ? `<span class="block mt-1 w-2 h-2 mx-auto rounded-full bg-primary"></span>` : ''}
+                        </div>`;
+            }
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function showDayEvents(dateStr) {
+            const events = getCalendarEvents().filter(ev => ev.date === dateStr);
+            const eventList = document.getElementById('eventList');
+            if (!events.length) {
+                eventList.innerHTML = `<div class="text-gray-500 text-sm">No events for ${dateStr}.</div>`;
+                return;
+            }
+            eventList.innerHTML = `<div class="font-semibold mb-1 text-primary">${dateStr}</div>` +
+                events.map((ev, idx) => `
+                    <div class="flex items-center justify-between bg-gray-100 rounded px-3 py-1 mb-1">
+                        <span>${ev.title}</span>
+                        <button onclick="deleteCalendarEvent('${dateStr}', ${idx})" class="text-red-500 hover:underline text-xs">Delete</button>
+                    </div>
+                `).join('');
+        }
+
+
+       (function addCalendarNav() {
+    const nav = document.querySelector('nav .flex.items-center.space-x-4');
+    if (nav && !document.getElementById('calendarNavBtn')) {
+        const btn = document.createElement('button');
+        btn.id = "calendarNavBtn"; 
+        btn.className = "text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium";
+        btn.textContent = "Calendar";
+        btn.onclick = function() {
+            showSection('calendar');
+            renderCalendar();
+            document.getElementById('eventList').innerHTML = '';
+        };
+        nav.insertBefore(btn, nav.children[1]);
+    }
+})();
+
+        function deleteCalendarEvent(dateStr, idx) {
+            let events = getCalendarEvents();
+            const filtered = [];
+            let count = 0;
+            for (let ev of events) {
+                if (ev.date === dateStr && count === idx) {
+                    count++;
+                    continue;
+                }
+                if (ev.date === dateStr) count++;
+                filtered.push(ev);
+            }
+            setCalendarEvents(filtered);
+            renderCalendar();
+            showDayEvents(dateStr);
+        }
+
+        // Navigation
+        function changeMonth(offset) {
+            calendarState.month += offset;
+            if (calendarState.month < 0) {
+                calendarState.month = 11;
+                calendarState.year--;
+            } else if (calendarState.month > 11) {
+                calendarState.month = 0;
+                calendarState.year++;
+            }
+            renderCalendar();
+            document.getElementById('eventList').innerHTML = '';
+        }
+
+        // Add Calendar to Navigation
+        (function addCalendarNav() {
+    const nav = document.querySelector('nav .flex.items-center.space-x-4');
+    if (nav && !document.getElementById('calendarNavBtn')) {
+        const btn = document.createElement('button');
+        btn.id = "calendarNavBtn";
+        btn.className = "text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium";
+        btn.textContent = "Calendar";
+        btn.onclick = function() {
+            showSection('calendar');
+            renderCalendar();
+            document.getElementById('eventList').innerHTML = '';
+        };
+        nav.insertBefore(btn, nav.children[1]);
+        updateNavVisibility(); 
+    }
+})();
+function addCalendarEvent(event) {
+    event.preventDefault();
+    const date = document.getElementById('eventDate').value;
+    const title = document.getElementById('eventTitle').value.trim();
+    if (!date || !title) return;
+    const events = getCalendarEvents();
+    events.push({ date, title });
+    setCalendarEvents(events);
+    renderCalendar();
+    showDayEvents(date);
+    document.getElementById('eventForm').reset();
+    addNotification(`Calendar reminder set for ${date}: ${title}`);
+}
+
+(function addCalculatorNav() {
+    const nav = document.querySelector('nav .flex.items-center.space-x-4');
+    if (nav && !document.getElementById('calculatorNavBtn')) {
+        const btn = document.createElement('button');
+        btn.id = "calculatorNavBtn";
+        btn.className = "text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium";
+        btn.textContent = "Earnings Calculator";
+        btn.onclick = function() {
+            openCalculatorModal();
+        };
+        nav.appendChild(btn);
+        updateNavVisibility(); 
+    }
+})();
+
+document.addEventListener('DOMContentLoaded', function() {
+    const nav = document.querySelector('nav .flex.items-center.space-x-4');
+    if (nav && !document.getElementById('adminNavBtn')) {
+        const btn = document.createElement('button');
+        btn.id = "adminNavBtn";
+        btn.className = "text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium";
+        btn.textContent = "Admin";
+        btn.onclick = function() {
+            showSection('adminDashboard');
+            renderAdminDashboard();
+        };
+        nav.appendChild(btn);
+        updateNavVisibility(); 
+    }
+});    // Attach month navigation after DOM loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            const prev = document.getElementById('prevMonth');
+            const next = document.getElementById('nextMonth');
+            if (prev && next) {
+                prev.onclick = () => changeMonth(-1);
+                next.onclick = () => changeMonth(1);
+            }
+        });
+    </script>
+    <!-- Jobs Section -->
+    <div id="jobs" class="section hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">Available Student Jobs</h2>
+                <p class="text-gray-600 mt-2">Find flexible opportunities that fit your schedule</p>
+            </div>
+
+            <!-- Filters -->
+          <div class="mb-6 flex flex-wrap gap-4">
+    <select id="countryFilter" class="border border-gray-300 rounded-md px-3 py-2">
+        <option value="">All Countries</option>
+        <option value="United States">United States</option>
+        
+        
+    </select>
+    <select id="categoryFilter" class="border border-gray-300 rounded-md px-3 py-2">
+        <option value="">All Categories</option>
+       
+        <option value="remote">Remote Work</option>
+        
+    </select>
+    <select id="payFilter" class="border border-gray-300 rounded-md px-3 py-2">
+        <option value="">All Pay Ranges</option>
+        <option value="10-15">$10-$15/hour</option>
+        <option value="10-20">$10-$20/hour</option>
+        <option value="20+">$20+/hour</option>
+    </select>
+    <button onclick="filterJobs()" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-secondary">Apply Filters</button>
+</div>
+
+            </div>
+
+            <!-- Job Listings -->
+            <div id="jobListings" class="space-y-4">
+            
+            </div>
+        </div>
+    </div>
+
+        <!-- Post Job  -->
+    <div id="post" class="section hidden">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Post a Student Job</h2>
+                <form id="postJobForm" class="space-y-6" onsubmit="postJob(event)"></form>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Job Title</label>
+                        <input type="text" id="jobTitle" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+                    
+                    <form id="postJobForm" class="space-y-6" onsubmit="postJob(event)">
+    
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Company/Organization</label>
+        <input type="text" id="company" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+            <select id="jobCategory" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                <option value="">Select Category</option>
+                
+                <option value="remote">Remote Work</option>
+                
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Hourly Pay</label>
+            <input type="number" id="hourlyPay" min="10" max="50" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+        </div>
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+        <input type="text" id="location" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Job Description</label>
+        <textarea id="description" rows="4" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Requirements</label>
+        <textarea id="requirements" rows="3" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
+        <input type="email" id="contactEmail" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+    </div>
+    <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-md hover:bg-secondary font-medium">Post Job</button>
+</form>
+<div id="postJobStatus" class="mt-4 text-center text-sm"></div>
+
+                        
+                     
+                    
+                </form><form id="applicationForm" onsubmit="submitApplication(event)"></form>
+                <div id="postJobStatus" class="mt-4 text-center text-sm"></div>
+            </div>
+        </div>
+    </div>
+    
+    
+
+    <!-- Profile Section -->
+    <div id="profile" class="section hidden">
+        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="relative bg-gradient-to-br from-primary via-blue-400 to-secondary rounded-3xl shadow-2xl p-1">
+                <div class="bg-white rounded-2xl p-8 shadow-lg">
+                    <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
+                        <!-- Avatar -->
+                        <div class="flex-shrink-0">
+                            <div class="w-32 h-32 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-lg border-4 border-white">
+                                <span class="text-5xl font-bold text-white select-none">
+                                    <script>
+                                        // Render initials for avatar
+                                        (function() {
+                                            const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+                                            if (user && user.name) {
+                                                document.write(user.name.split(' ').map(n => n[0]).join('').toUpperCase());
+                                            } else {
+                                                document.write('U');
+                                            }
+                                        })();
+                                    </script>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1">
+                            <h2 class="text-3xl font-extrabold text-primary mb-2" id="profileNameDisplay"></h2>
+                            <p class="text-lg text-gray-700 italic mb-4" id="profileBioDisplay"></p>
+                            <div class="mb-4">
+                                <span class="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full font-semibold text-sm mr-2">Likes</span>
+                                <span class="text-gray-600" id="profileLikesDisplay"></span>
+                            </div>
+                            <div>
+                                <span class="font-semibold text-gray-800">Email:</span>
+                                <span class="text-gray-600" id="profileEmailDisplay"></span>
+                            </div>
+                            <div class="mt-6 flex flex-wrap gap-3">
+                                <button onclick="editProfile()" class="bg-primary text-white px-6 py-2 rounded-md hover:bg-secondary font-medium shadow transition">Edit Profile</button>
+                                <button onclick="logoutProfile()" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-300 font-medium shadow transition">Logout</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="editProfileModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Edit Profile</h3>
+            <form onsubmit="saveProfile(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                        <input type="text" id="profileName" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                        <textarea id="profileBio" rows="3" required class="w-full border border-gray-300 rounded-md px-3 py-2"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Likes (comma separated)</label>
+                        <input type="text" id="profileLikes" class="w-full border border-gray-300 rounded-md px-3 py-2" placeholder="e.g. coding, reading, football">
+                    </div>
+                </div>
+                <div class="mt-6 flex space-x-3">
+                    <button type="submit" class="flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary">Save</button>
+                    <button type="button" onclick="closeEditProfileModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Change Password</h3>
+            <form onsubmit="changePassword(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+                        <input type="password" id="currentPassword" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                        <input type="password" id="newPassword" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                        <input type="password" id="confirmNewPassword" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                </div>
+                <div class="mt-6 flex space-x-3">
+                    <button type="submit" class="flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary">Change</button>
+                    <button type="button" onclick="closeChangePasswordModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400">Cancel</button>
+                </div>
+            </form>
+            <div id="changePasswordStatus" class="mt-4 text-center text-sm"></div>
+        </div>
+    </div>
+    <script>
+        function openChangePasswordModal() {
+            document.getElementById('changePasswordModal').classList.remove('hidden');
+            document.getElementById('changePasswordModal').classList.add('flex');
+            document.getElementById('changePasswordStatus').textContent = '';
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmNewPassword').value = '';
+        }
+        function closeChangePasswordModal() {
+            document.getElementById('changePasswordModal').classList.add('hidden');
+            document.getElementById('changePasswordModal').classList.remove('flex');
+        }
+        function changePassword(event) {
+            event.preventDefault();
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmNewPassword').value;
+            const status = document.getElementById('changePasswordStatus');
+            let user = getCurrentUser();
+            if (!user) {
+                status.textContent = "No user logged in.";
+                status.className = "mt-4 text-center text-sm text-red-500";
+                return;
+            }
+            if (current !== user.password) {
+                status.textContent = "Current password is incorrect.";
+                status.className = "mt-4 text-center text-sm text-red-500";
+                return;
+            }
+            if (newPass.length < 4) {
+                status.textContent = "New password must be at least 4 characters.";
+                status.className = "mt-4 text-center text-sm text-red-500";
+                return;
+            }
+            if (newPass !== confirm) {
+                status.textContent = "New passwords do not match.";
+                status.className = "mt-4 text-center text-sm text-red-500";
+                return;
+            }
+            user.password = newPass;
+            setCurrentUser(user);
+            let users = getUsers();
+            users = users.map(u => u.email === user.email ? user : u);
+            setUsers(users);
+            status.textContent = "Password changed successfully!";
+            status.className = "mt-4 text-center text-sm text-green-600";
+            addNotification("Your password was changed.");
+            setTimeout(closeChangePasswordModal, 1200);
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileSection = document.querySelector('#profile .flex-1 .mt-6.flex');
+            if (profileSection && !document.getElementById('changePasswordBtn')) {
+                const btn = document.createElement('button');
+                btn.id = "changePasswordBtn";
+                btn.className = "bg-yellow-500 text-white px-6 py-2 rounded-md hover:bg-yellow-600 font-medium shadow transition";
+                btn.textContent = "Change Password";
+                btn.type = "button";
+                btn.onclick = openChangePasswordModal;
+                profileSection.appendChild(btn);
+            }
+        });
+    </script>
+    
+
+    <!-- Sign Up Page -->
+    <div id="signup" class="section hidden">
+        <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Sign Up</h2>
+                <form onsubmit="signup(event)" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="signupEmail" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" id="signupPassword" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-md hover:bg-secondary font-medium">Sign Up</button>
+                </form>
+                <p class="mt-4 text-sm text-gray-600">Already have an account? <a href="#" onclick="showSection('login')" class="text-primary hover:underline">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Page -->
+    <div id="login" class="section hidden">
+        <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Login</h2>
+                <form onsubmit="login(event)" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="loginEmail" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" id="loginPassword" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-md hover:bg-secondary font-medium">Login</button>
+                </form>
+                <p class="mt-4 text-sm text-gray-600">Don't have an account? <a href="#" onclick="showSection('signup')" class="text-primary hover:underline">Sign Up</a></p>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="applicationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Apply for Position</h3>
+            <form onsubmit="submitApplication(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                        <input type="text" id="applicantName" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="applicantEmail" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                        <input type="tel" id="applicantPhone" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">University/School</label>
+                        <input type="text" id="applicantSchool" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Available Hours (per week)</label>
+                        <input type="number" id="availableHours" min="5" max="40" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Why are you interested?</label>
+                        <textarea id="whyInterested" rows="3" required class="w-full border border-gray-300 rounded-md px-3 py-2"></textarea>
+                    </div>
+                </div>
+                <div class="mt-6 flex space-x-3">
+                    <button type="submit" class="flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary">Submit Application</button>
+                    <button type="button" onclick="closeModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        
+        
+
+        let notifications = getNotifications();
+        if (!notifications.length) {
+            
+            setNotifications(notifications);
+        }
+
+        function toggleNotifications() {
+            const panel = document.getElementById('notificationPanel');
+            panel.classList.toggle('hidden');
+            if (!panel.classList.contains('hidden')) {
+                renderNotifications();
+                markNotificationsRead();
+            }
+        }
+
+        function renderNotifications() {
+    const list = document.getElementById('notificationList');
+    if (!notifications.length) {
+        list.innerHTML = `<div class="text-gray-500 text-center py-6">No notifications.</div>`;
+        return;
+    }
+    list.innerHTML = notifications.map(n => `
+        <div class="flex items-start gap-2 ${n.read ? 'opacity-60' : ''}">
+            <span class="mt-1">
+                <svg class="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="10"/>
+                </svg>
+            </span>
+            <div>
+                <div class="text-gray-800">${n.message}</div>
+                <div class="text-xs text-gray-400">${getPostedLabel(n.time)}</div>
+            </div>
+        </div>
+    `).join('');
+    updateNotificationDot();
+}
+
+        function markNotificationsRead() {
+            notifications = notifications.map(n => ({ ...n, read: true }));
+            setNotifications(notifications);
+            updateNotificationDot();
+        }
+
+        function updateNotificationDot() {
+            const dot = document.getElementById('notificationDot');
+            const hasUnread = notifications.some(n => !n.read);
+            if (hasUnread) {
+                dot.classList.remove('hidden');
+            } else {
+                dot.classList.add('hidden');
+            }
+        }
+        function addNotification(message) {
+    notifications.unshift({
+        id: Date.now(),
+        message,
+        time: new Date().toLocaleString(), 
+        read: false
+    });
+    setNotifications(notifications);
+    updateNotificationDot();
+}
+
+        window.addEventListener('DOMContentLoaded', () => {
+            notifications = getNotifications();
+            updateNotificationDot();
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+    
+    notifyTodayEvents();
+});
+
+        // --- User/Profile Logic ---
+        function getUsers() {
+            return JSON.parse(localStorage.getItem('users') || '[]');
+        }
+        function setUsers(users) {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+        function getCurrentUser() {
+            return JSON.parse(localStorage.getItem('currentUser') || 'null');
+        }
+        function setCurrentUser(user) {
+            localStorage.setItem('currentUser', JSON.stringify(user));
+        }
+
+        function showProfile() {
+            showSection('profile');
+            renderProfile();
+        }
+
+        function renderProfile() {
+            const user = getCurrentUser();
+            if (!user) {
+                showSection('login');
+                return;
+            }
+            document.getElementById('profileNameDisplay').textContent = user.name || 'No Name Set';
+            document.getElementById('profileBioDisplay').textContent = user.bio || 'No bio yet.';
+            document.getElementById('profileLikesDisplay').textContent = user.likes && user.likes.length ? user.likes.join(', ') : 'None listed.';
+            document.getElementById('profileEmailDisplay').textContent = user.email;
+            
+            const profileContent = document.getElementById('profileContent');
+            if (!profileContent) {
+                console.error('Profile content element not found');
+                return;
+            }
+            
+            profileContent.innerHTML = '';
+            
+            if (!user) {
+                profileContent.innerHTML = '<p class="text-red-500">No user data available. Please log in.</p>';
+                return;
+            }
+            // Create profile content
+            document.getElementById('profileNameDisplay').textContent = user.name || 'No Name Set';
+            document.getElementById('profileBioDisplay').textContent = user.bio || 'No bio yet.';
+            document.getElementById('profileLikesDisplay').textContent = user.likes && user.likes.length ? user.likes.join(', ') : 'None listed.';
+            document.getElementById('profileEmailDisplay').textContent = user.email;
+            
+            const content = document.getElementById('profileContent');
+            content.innerHTML = `
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-900">${user.name || 'No Name Set'}</h3>
+                    <p class="text-gray-700 mt-2">${user.bio || 'No bio yet.'}</p>
+                    <div class="mt-4">
+                        <span class="font-semibold text-gray-800">Likes:</span>
+                        <span class="text-gray-600">${user.likes ? user.likes.join(', ') : 'None listed.'}</span>
+                    </div>
+                    <div class="mt-4">
+                        <span class="font-semibold text-gray-800">Email:</span>
+                        <span class="text-gray-600">${user.email}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function editProfile() {
+            const user = getCurrentUser();
+            if (!user) return;
+            document.getElementById('profileName').value = user.name || '';
+            document.getElementById('profileBio').value = user.bio || '';
+            document.getElementById('profileLikes').value = user.likes ? user.likes.join(', ') : '';
+            document.getElementById('editProfileModal').classList.remove('hidden');
+            document.getElementById('editProfileModal').classList.add('flex');
+        }
+       
+function getCurrentUserEmail() {
+    const user = getCurrentUser();
+    return user ? user.email : null;
+    
+    
+}
+
+
+function getNotifications() {
+    const email = getCurrentUserEmail();
+    if (!email) return [];
+    return JSON.parse(localStorage.getItem('notifications_' + email) || '[]');
+}
+
+
+function setNotifications(notifs) {
+    const email = getCurrentUserEmail();
+    if (!email) return;
+    localStorage.setItem('notifications_' + email, JSON.stringify(notifs));
+}
+
+        function saveProfile(event) {
+            event.preventDefault();
+            let user = getCurrentUser();
+            if (!user) return;
+            user.name = document.getElementById('profileName').value;
+            user.bio = document.getElementById('profileBio').value;
+            user.likes = document.getElementById('profileLikes').value.split(',').map(l => l.trim()).filter(l => l);
+            setCurrentUser(user);
+
+            let users = getUsers();
+            users = users.map(u => u.email === user.email ? user : u);
+            setUsers(users);
+
+            closeEditProfileModal();
+            renderProfile();
+            addNotification("Your profile was updated successfully.");
+        }
+
+        function closeEditProfileModal() {
+            document.getElementById('editProfileModal').classList.add('hidden');
+            document.getElementById('editProfileModal').classList.remove('flex');
+        }
+
+        function logoutProfile() {
+            localStorage.removeItem('currentUser');
+            showSection('login');
+        }
+        
+
+        function signup(event) {
+            event.preventDefault();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            let users = getUsers();
+            if (users.find(u => u.email === email)) {
+                alert('Email already registered.');
+                return;
+            }
+            const user = { email, password, name: '', bio: '', likes: [] };
+            users.push(user);
+            setUsers(users);
+            setCurrentUser(user);
+            alert('Signup successful! Please complete your profile.');
+            showProfile();
+            addNotification("Welcome to Brexbin ! 🎉");
+        }
+
+        function login(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            let users = getUsers();
+            const user = users.find(u => u.email === email && u.password === password);
+            if (!user) {
+                alert('Invalid email or password.');
+                return;
+            }
+            setCurrentUser(user);
+            showProfile();
+        }
+
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(section).classList.remove('hidden');
+            if (section === 'jobs') displayJobs(jobs); 
+            if (section === 'profile') renderProfile();
+}
+
+        window.addEventListener('DOMContentLoaded', () => {
+            notifications = getNotifications();
+            const user = getCurrentUser();
+            if (user) {
+                showProfile();
+            } else {
+                showSection('login');
+            }
+            updateNotificationDot();
+        });
+
+        
+
+        // --- Job Board  ---
+        let defaultJobs = [
+
+        // USA jobs from Google search (examples)
+        {
+        id: 9,
+        title: "Part-Time Retail Associate",
+        company: "Target",
+        category: "retail",
+        pay: 15,
+        location: "New York, NY",
+        country: "United States",
+        description: "Assist customers, stock shelves, and operate cash registers. Flexible hours for students.",
+        requirements: "High school diploma or equivalent, strong communication skills",
+        contact: "careers@target.com",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 10,
+        title: "Student Administrative Assistant",
+        company: "University of California, Los Angeles",
+        category: "campus",
+        pay: 17,
+        location: "Los Angeles, CA",
+        country: "United States",
+        description: "Support office staff with filing, scheduling, and data entry. Great for students seeking office experience.",
+        requirements: "Current UCLA student, basic computer skills",
+        contact: "jobs@ucla.edu",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 11,
+        title: "Food Service Worker",
+        company: "Aramark",
+        category: "food",
+        pay: 14,
+        location: "Chicago, IL",
+        country: "United States",
+        description: "Serve food, maintain cleanliness, and assist with kitchen prep in a university dining hall.",
+        requirements: "Ability to stand for long periods, team player",
+        contact: "apply@aramark.com",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 12,
+        title: "Remote Data Entry Clerk",
+        company: "Kelly Services",
+        category: "remote",
+        pay: 16,
+        location: "Remote",
+        country: "United States",
+        description: "Enter and update data for various clients. Work from home, ideal for students with good typing skills.",
+        requirements: "Attention to detail, reliable internet connection",
+        contact: "jobs@kellyservices.com",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 13,
+        title: "Delivery Driver",
+        company: "DoorDash",
+        category: "delivery",
+        pay: 20,
+        location: "Houston, TX",
+        country: "United States",
+        description: "Deliver food orders to customers using your car or bike. Flexible scheduling and weekly pay.",
+        requirements: "Valid driver's license, smartphone",
+        contact: "support@doordash.com",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 14,
+        title: "Peer Tutor",
+        company: "Boston University",
+        category: "tutoring",
+        pay: 18,
+        location: "Boston, MA",
+        country: "United States",
+        description: "Tutor fellow students in math, science, or writing. Set your own hours and help others succeed.",
+        requirements: "Current BU student, GPA 3.0+",
+        contact: "tutoring@bu.edu",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 15,
+        title: "Library Assistant",
+        company: "New York Public Library",
+        category: "campus",
+        pay: 13,
+        location: "New York, NY",
+        country: "United States",
+        description: "Help organize books, assist patrons, and support library events.",
+        requirements: "Attention to detail, customer service skills",
+        contact: "jobs@nypl.org",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 16,
+        title: "Barista",
+        company: "Starbucks",
+        category: "food",
+        pay: 14,
+        location: "Seattle, WA",
+        country: "United States",
+        description: "Prepare coffee and beverages, serve customers, and maintain cleanliness.",
+        requirements: "Friendly attitude, ability to multitask",
+        contact: "careers@starbucks.com",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 17,
+        title: "Campus Tour Guide",
+        company: "University of Michigan",
+        category: "campus",
+        pay: 15,
+        location: "Ann Arbor, MI",
+        country: "United States",
+        description: "Lead prospective students and families on campus tours.",
+        requirements: "Outgoing personality, current student",
+        contact: "admissions@umich.edu",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 18,
+        title: "IT Help Desk Assistant",
+        company: "Georgia Tech",
+        category: "campus",
+        pay: 16,
+        location: "Atlanta, GA",
+        country: "United States",
+        description: "Assist students and staff with basic IT issues and troubleshooting.",
+        requirements: "Basic computer knowledge, communication skills",
+        contact: "itjobs@gatech.edu",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 19,
+        title: "Freelance Graphic Designer",
+        company: "Fiverr",
+        category: "remote",
+        pay: 25,
+        location: "Remote",
+        country: "United States",
+        description: "Create logos, flyers, and digital graphics for clients online.",
+        requirements: "Portfolio, design software skills",
+        contact: "support@fiverr.com",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 20,
+        title: "Babysitter",
+        company: "Care.com",
+        category: "delivery",
+        pay: 18,
+        location: "Dallas, TX",
+        country: "United States",
+        description: "Supervise and care for children during evenings and weekends.",
+        requirements: "Experience with children, references",
+        contact: "jobs@care.com",
+        posted:  new Date().toLocaleDateString()
+        },
+        {
+        id: 21,
+        title: "Warehouse Associate",
+        company: "Amazon",
+        category: "retail",
+        pay: 17,
+        location: "Phoenix, AZ",
+        country: "United States",
+        description: "Pick, pack, and ship orders in a fast-paced warehouse environment.",
+        requirements: "Ability to lift 50 lbs, punctuality",
+        contact: "jobs@amazon.com",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 22,
+        title: "Social Media Assistant",
+        company: "SocialBee",
+        category: "remote",
+        pay: 15,
+        location: "Remote",
+        country: "United States",
+        description: "Schedule posts, engage with followers, and track analytics.",
+        requirements: "Familiarity with social platforms, writing skills",
+        contact: "hr@socialbee.com",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 23,
+        title: "Dog Walker",
+        company: "Rover",
+        category: "delivery",
+        pay: 20,
+        location: "San Diego, CA",
+        country: "United States",
+        description: "Walk and care for dogs in your local area.",
+        requirements: "Love for animals, reliable transportation",
+        contact: "jobs@rover.com",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 24,
+        title: "Math Tutor",
+        company: "Varsity Tutors",
+        category: "tutoring",
+        pay: 22,
+        location: "Remote",
+        country: "United States",
+        description: "Tutor K-12 and college students in math subjects online.",
+        requirements: "Strong math background, teaching skills",
+        contact: "jobs@varsitytutors.com",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 25,
+        title: "Event Staff",
+        company: "Eventbrite",
+        category: "retail",
+        pay: 16,
+        location: "Miami, FL",
+        country: "United States",
+        description: "Assist with event setup, guest check-in, and logistics.",
+        requirements: "Friendly demeanor, ability to stand for long periods",
+        contact: "jobs@eventbrite.com",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 26,
+        title: "Research Assistant",
+        company: "Stanford University",
+        category: "campus",
+        pay: 19,
+        location: "Stanford, CA",
+        country: "United States",
+        description: "Support faculty with research, data entry, and literature reviews.",
+        requirements: "Current student, research interest",
+        contact: "hr@stanford.edu",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 27,
+        title: "Food Delivery Biker",
+        company: "Uber Eats",
+        category: "delivery",
+        pay: 18,
+        location: "Philadelphia, PA",
+        country: "United States",
+        description: "Deliver food orders by bike, set your own schedule.",
+        requirements: "Bike, smartphone",
+        contact: "support@uber.com",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 28,
+        title: "Online English Tutor",
+        company: "VIPKid",
+        category: "tutoring",
+        pay: 20,
+        location: "Remote",
+        country: "United States",
+        description: "Teach English to children overseas via video chat.",
+        requirements: "Fluent English, teaching experience preferred",
+        contact: "jobs@vipkid.com",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 29,
+        title: "Cashier",
+        company: "Walmart",
+        category: "retail",
+        pay: 13,
+        location: "Orlando, FL",
+        country: "United States",
+        description: "Operate cash register, assist customers, and restock shelves.",
+        requirements: "Customer service skills, reliability",
+        contact: "careers@walmart.com",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 30,
+        title: "Fitness Center Attendant",
+        company: "YMCA",
+        category: "campus",
+        pay: 14,
+        location: "Denver, CO",
+        country: "United States",
+        description: "Monitor gym, assist members, and maintain equipment.",
+        requirements: "Interest in fitness, CPR certification a plus",
+        contact: "jobs@ymca.org",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 31,
+        title: "Remote Customer Service Rep",
+        company: "Liveops",
+        category: "remote",
+        pay: 16,
+        location: "Remote",
+        country: "United States",
+        description: "Answer calls and assist customers from home.",
+        requirements: "Good communication, computer with internet",
+        contact: "jobs@liveops.com",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 32,
+        title: "Bookstore Clerk",
+        company: "Barnes & Noble",
+        category: "retail",
+        pay: 14,
+        location: "San Francisco, CA",
+        country: "United States",
+        description: "Assist customers, organize books, and operate register.",
+        requirements: "Love of books, customer service skills",
+        contact: "jobs@barnesandnoble.com",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 33,
+        title: "Residence Hall Assistant",
+        company: "Ohio State University",
+        category: "campus",
+        pay: 15,
+        location: "Columbus, OH",
+        country: "United States",
+        description: "Support students in residence halls and help organize activities.",
+        requirements: "Current student, leadership skills",
+        contact: "housing@osu.edu",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 34,
+        title: "Remote Survey Taker",
+        company: "Survey Junkie",
+        category: "remote",
+        pay: 12,
+        location: "Remote",
+        country: "United States",
+        description: "Take online surveys and earn money from home.",
+        requirements: "Internet access, attention to detail",
+        contact: "support@surveyjunkie.com",
+        posted: new Date().toLocaleDateString()
+        },
+        {
+        id: 35,
+        title: "Catering Staff",
+        company: "Sodexo",
+        category: "food",
+        pay: 15,
+        location: "Austin, TX",
+        country: "United States",
+        description: "Assist with food prep and service at campus events.",
+        requirements: "Team player, food safety knowledge",
+        contact: "jobs@sodexo.com",
+        posted: new Date().toLocaleDateString()
+        },
+        
+
+    ]
+
+        
+        
+
+let jobs = [];
+if (localStorage.getItem('jobs')) {
+    jobs = JSON.parse(localStorage.getItem('jobs'));
+} else {
+    jobs = defaultJobs;
+    localStorage.setItem('jobs', JSON.stringify(jobs));
+}
+
+        
+ 
+
+        // Calculator Modal HTML
+        (function addCalculatorModal() {
+            if (document.getElementById('calculatorModal')) return;
+            const modal = document.createElement('div');
+            modal.id = "calculatorModal";
+            modal.className = "fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50";
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Earnings Calculator</h3>
+                    <form id="calculatorForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Hours Worked</label>
+                            <input type="number" id="calcHours" min="0" step="0.1" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Hourly Rate ($)</label>
+                            <input type="number" id="calcRate" min="0" step="0.01" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary font-medium">Calculate</button>
+                        </div>
+                    </form>
+                    <div id="calcResult" class="mt-4 text-lg font-semibold text-primary"></div>
+                    <div class="mt-4 flex space-x-3">
+                        <button type="button" onclick="closeCalculatorModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400">Close</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        })();
+
+        function openCalculatorModal() {
+            document.getElementById('calculatorModal').classList.remove('hidden');
+            document.getElementById('calculatorModal').classList.add('flex');
+            document.getElementById('calculatorForm').reset();
+            document.getElementById('calcResult').textContent = '';
+        }
+
+        function closeCalculatorModal() {
+            document.getElementById('calculatorModal').classList.add('hidden');
+            document.getElementById('calculatorModal').classList.remove('flex');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('calculatorForm');
+            if (form) {
+                form.onsubmit = function(e) {
+                    e.preventDefault();
+                    const hours = parseFloat(document.getElementById('calcHours').value);
+                    const rate = parseFloat(document.getElementById('calcRate').value);
+                    if (isNaN(hours) || isNaN(rate)) return;
+                    const total = hours * rate;
+                    document.getElementById('calcResult').textContent = `Total Earnings: $${total.toFixed(2)}`;
+                };
+            }
+        });
+
+        let currentJobId = null;
+
+        function displayJobs(jobsToShow) {
+    const container = document.getElementById('jobListings');
+    container.innerHTML = '';
+
+    jobsToShow.forEach(job => {
+        const jobCard = document.createElement('div');
+        jobCard.className = 'bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow';
+        jobCard.innerHTML = `
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-900">${job.title}</h3>
+                    <p class="text-gray-600">${job.company}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-2xl font-bold text-primary">$${job.pay}/hr</p>
+                    <p class="text-sm text-gray-500">${getPostedLabel(job.posted)}</p>
+                </div>
+            </div>
+            <div class="mb-4">
+                <p class="text-gray-700 mb-2">${job.description}</p>
+                <p class="text-sm text-gray-600"><strong>Requirements:</strong> ${job.requirements}</p>
+            </div>
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary text-white">
+                        ${job.category.charAt(0).toUpperCase() + job.category.slice(1)}
+                    </span>
+                    <span class="text-sm text-gray-500">
+                        <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        ${job.location}
+                    </span>
+                </div>
+                ${job.applyUrl ? `
+                    <a href="${job.applyUrl}" target="_blank" rel="noopener" class="bg-primary text-white px-6 py-2 rounded-md hover:bg-secondary font-medium">
+                        Apply Now
+                    </a>
+                ` : `
+                    <button disabled class="bg-gray-300 text-gray-500 px-6 py-2 rounded-md font-medium cursor-not-allowed">
+                        No External Link
+                    </button>
+                `}
+            </div>
+        `;
+        container.appendChild(jobCard);
+    });
+}
+
+        function filterJobs() {
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const payFilter = document.getElementById('payFilter').value;
+
+            let filteredJobs = jobs.filter(job => {
+                let matchesCategory = !categoryFilter || job.category === categoryFilter;
+                let matchesPay = true;
+
+                if (payFilter) {
+                    if (payFilter === '10-15') {
+                        matchesPay = job.pay >= 10 && job.pay <= 15;
+                    } else if (payFilter === '15-20') {
+                        matchesPay = job.pay > 15 && job.pay <= 20;
+                    } else if (payFilter === '20+') {
+                        matchesPay = job.pay > 20;
+                    }
+                }
+
+                return matchesCategory && matchesPay;
+            });
+
+            displayJobs(filteredJobs);
+        }
+
+        function openApplicationModal(jobId) {
+            currentJobId = jobId;
+            document.getElementById('applicationModal').classList.remove('hidden');
+            document.getElementById('applicationModal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('applicationModal').classList.add('hidden');
+            document.getElementById('applicationModal').classList.remove('flex');
+            currentJobId = null;
+        }
+        function submitApplication(event) {
+    event.preventDefault();
+    // Get applicant info
+    const name = document.getElementById('applicantName').value.trim();
+    const email = document.getElementById('applicantEmail').value.trim();
+    const phone = document.getElementById('applicantPhone').value.trim();
+    const school = document.getElementById('applicantSchool').value.trim();
+    const hours = document.getElementById('availableHours').value.trim();
+    const why = document.getElementById('whyInterested').value.trim();
+    if (!name || !email || !phone || !school || !hours || !why) {
+        alert('Please fill in all fields.');
+        return;
+    }
+    const job = jobs.find(j => j.id === currentJobId);
+    const jobTitle = job ? job.title : 'the job';
+    addNotification(`You applied for: ${jobTitle}`);
+    setTimeout(() => {
+        const rejected = Math.random() < 0.5;
+        if (rejected) {
+            addNotification(`Your application for ${jobTitle} was rejected.`);
+            alert('Sorry, your application was not successful this time.');
+        } else {
+            addNotification(`Congratulations! Your application for ${jobTitle} was accepted.`);
+            alert('Your application was submitted successfully!');
+        }
+    }, 10000);
+    closeModal();
+    event.target.reset();
+}
+
+
+
+
+        
+
+function postJob(event) {
+    event.preventDefault();
+
+    const newJob = {
+        id: jobs.length + 1,
+        title: document.getElementById('jobTitle').value,
+        company: document.getElementById('company').value,
+        category: document.getElementById('jobCategory').value,
+        pay: parseInt(document.getElementById('hourlyPay').value),
+        location: document.getElementById('location').value,
+        description: document.getElementById('description').value,
+        requirements: document.getElementById('requirements').value,
+        contact: document.getElementById('contactEmail').value,
+        posted: new Date().toLocaleString()
+    };
+
+    jobs.unshift(newJob);
+    localStorage.setItem('jobs', JSON.stringify(jobs)); 
+
+    alert('Job posted successfully! It will appear in the job listings.');
+    event.target.reset();
+    showSection('jobs');
+    addNotification(`New job posted: ${newJob.title}`);
+}
+// Save application
+function saveApplication(jobId, jobTitle, status) {
+    const email = getCurrentUserEmail();
+    if (!email) return;
+    const key = 'applications_' + email;
+    let apps = JSON.parse(localStorage.getItem(key) || '[]');
+    apps.unshift({
+        jobId,
+        jobTitle,
+        status,
+        date: new Date().toLocaleString()
+    });
+    localStorage.setItem(key, JSON.stringify(apps));
+}
+
+saveApplication(currentJobId, jobTitle, "Pending");
+function saveJob(jobId) {
+    const email = getCurrentUserEmail();
+    if (!email) return;
+    let saved = JSON.parse(localStorage.getItem('savedJobs_' + email) || '[]');
+    if (!saved.includes(jobId)) saved.push(jobId);
+    localStorage.setItem('savedJobs_' + email, JSON.stringify(saved));
+    addNotification("Job saved!");
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const nav = document.querySelector('nav .flex.items-center.space-x-4');
+    
+    const existingBtn = document.getElementById('adminNavBtn');
+    if (existingBtn) existingBtn.remove();
+
+    
+    const user = getCurrentUser();
+    if (nav && user && (user.email === "admin@brexbin.com" || user.isAdmin === true)) {
+        const btn = document.createElement('button');
+        btn.id = "adminNavBtn";
+        btn.className = "text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium";
+        btn.textContent = "Admin";
+        btn.onclick = function() {
+            showSection('adminDashboard');
+            renderAdminDashboard();
+        };
+        nav.appendChild(btn);
+        updateNavVisibility();
+    }
+});
+function isAdmin() {
+    const user = getCurrentUser();
+    
+    return user && (user.email === "admin@brexbin.com") || user.isAdmin === true;
+}
+
+
+
+function deleteUserAsAdmin(userIdx) {
+    let users = getUsers();
+    const user = users[userIdx];
+    if (!user) return;
+    if (user.isAdmin) {
+        alert("You cannot delete an admin user.");
+        return;
+    }
+    if (!confirm(`Are you sure you want to delete user: ${user.email}?`)) return;
+    users.splice(userIdx, 1);
+    setUsers(users);
+    renderAdminDashboard();
+    addNotification(`User ${user.email} deleted by admin.`);
+}
+
+function deleteJobAsAdmin(jobId) {
+    if (!confirm("Are you sure you want to delete this job?")) return;
+    jobs = jobs.filter(j => j.id !== jobId);
+    localStorage.setItem('jobs', JSON.stringify(jobs));
+    renderAdminDashboard();
+    addNotification("Job deleted by admin.");
+}
+function signup(event) {
+    event.preventDefault();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    let users = getUsers();
+    if (users.find(u => u.email === email)) {
+        alert('Email already registered.');
+        return;
+    }
+    const user = { email, password, name: '', bio: '', likes: [] };
+    
+    if (email === "admin@brexbin.com") user.isAdmin = true;
+    users.push(user);
+    setUsers(users);
+    setCurrentUser(user);
+    alert('Signup successful! Please complete your profile.');
+    showProfile();
+    addNotification("Welcome to Brexbin ! 🎉");
+}
+function updateNavVisibility() {
+    const user = getCurrentUser();
+    const navIds = [
+        "navHomeBtn",
+        "navJobsBtn",
+        "navPostBtn",
+        "navProfileBtn",
+        "adminNavBtn",
+        "calendarNavBtn",
+        "calculatorNavBtn",
+        "navPaymentBtn",
+        "navGroupChatBtn"
+    ];
+    navIds.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.style.display = user ? "" : "none";
+        }
+    });
+}
+
+
+function login(event) {
+    event.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    let users = getUsers();
+    const user = users.find(u => u.email === email && u.password === password);
+    if (!user) {
+        alert('Invalid email or password.');
+        return;
+    }
+    setCurrentUser(user);
+    showProfile();
+    updateNavVisibility();
+    document.dispatchEvent(new Event('DOMContentLoaded')); 
+}
+
+function logoutProfile() {
+    localStorage.removeItem('currentUser');
+    showSection('login');
+    updateNavVisibility();
+    document.dispatchEvent(new Event('DOMContentLoaded')); 
+}
+
+
+window.addEventListener('DOMContentLoaded', updateNavVisibility);
+
+
+
+
+
+
+
+function setUserActive() {
+    const user = getCurrentUser();
+    if (user) {
+        user.lastActive = Date.now();
+        setCurrentUser(user);
+        
+        let users = getUsers();
+        users = users.map(u => u.email === user.email ? { ...u, lastActive: user.lastActive } : u);
+        setUsers(users);
+    }
+}
+
+
+window.addEventListener('mousemove', setUserActive);
+window.addEventListener('keydown', setUserActive);
+window.addEventListener('click', setUserActive);
+
+
+
+
+  
+// --- Dashboard Overview Cards ---
+function getAllApplications() {
+    let allApps = [];
+    let users = getUsers();
+    let jobIds = jobs.map(j => j.id);
+    users.forEach(u => {
+        let apps = JSON.parse(localStorage.getItem('applications_' + u.email) || '[]');
+        apps.forEach((app, idx) => {
+            
+            if (jobIds.includes(app.jobId)) {
+                allApps.push({
+                    ...app,
+                    user: u.email,
+                    appIdx: idx
+                });
+            }
+        });
+    });
+    return allApps;
+}
+function getActiveUsersToday() {
+    const users = getUsers();
+    const today = new Date().toDateString();
+    return users.filter(u => u.lastActive && new Date(u.lastActive).toDateString() === today).length;
+}
+function getAllNotifications() {
+    let all = [];
+    getUsers().forEach(u => {
+        let notifs = JSON.parse(localStorage.getItem('notifications_' + u.email) || '[]');
+        notifs.forEach(n => all.push({ ...n, user: u.email }));
+    });
+    return all;
+}
+function getAllGroupMessages() {
+    return JSON.parse(localStorage.getItem('groupMessages') || '[]');
+}
+function deleteGroupMessage(idx) {
+    let msgs = getAllGroupMessages();
+    msgs.splice(idx, 1);
+    localStorage.setItem('groupMessages', JSON.stringify(msgs));
+    renderAdminDashboard();
+}
+
+// --- Admin Dashboard Render ---
+
+let adminUserSearchValue = ""; 
+
+function renderAdminDashboard() {
+    // Overview Cards
+    const allApps = getAllApplications();
+    const users = getUsers();
+    const activeToday = getActiveUsersToday();
+    const overviewHTML = `
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+            <div class="bg-primary text-white rounded-lg p-4 text-center">
+                <div class="text-2xl font-bold">${users.length}</div>
+                <div class="text-sm">Total Users</div>
+            </div>
+            <div class="bg-secondary text-white rounded-lg p-4 text-center">
+                <div class="text-2xl font-bold">${jobs.length}</div>
+                <div class="text-sm">Total Jobs</div>
+            </div>
+            
+            <div class="bg-green-500 text-white rounded-lg p-4 text-center">
+                <div class="text-2xl font-bold">${activeToday}</div>
+                <div class="text-sm">Active Today</div>
+            </div>
+            <div class="bg-yellow-400 text-white rounded-lg p-4 text-center">
+                <div class="text-2xl font-bold">${getAllGroupMessages().length}</div>
+                <div class="text-sm">Group Messages</div>
+            </div>
+        </div>
+    `;
+    document.querySelector("#adminDashboard .max-w-5xl").innerHTML = `
+        <h2 class="text-3xl font-bold text-primary mb-6">Admin Dashboard</h2>
+        ${overviewHTML}
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-2">All Users</h3>
+            <input type="text" id="adminUserSearch" value="${adminUserSearchValue}" placeholder="Search users..." class="mb-3 border px-2 py-1 rounded w-full max-w-xs">
+            <ul id="adminUserList" class="mb-6 bg-white rounded shadow p-4"></ul>
+        </div>
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-2">All Jobs</h3>
+            <ul id="adminJobList" class="bg-white rounded shadow p-4"></ul>
+        </div>
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-2">All Notifications</h3>
+            <ul id="adminNotifList" class="bg-white rounded shadow p-4"></ul>
+        </div>
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-2">Group Chat Messages</h3>
+            <ul id="adminGroupChatList" class="bg-white rounded shadow p-4"></ul>
+        </div>
+    `;
+
+    
+    const userList = document.getElementById('adminUserList');
+    const searchInput = document.getElementById('adminUserSearch');
+    searchInput.oninput = function() {
+        adminUserSearchValue = this.value;
+        renderAdminDashboard();
+    };
+    const search = adminUserSearchValue.toLowerCase();
+    userList.innerHTML = users
+        .map((u, idx) => ({ ...u, idx }))
+        .filter(u => u.email.toLowerCase().includes(search) || (u.name && u.name.toLowerCase().includes(search)))
+        .map(u => {
+            let activeLabel = '';
+            if (u.lastActive && Date.now() - u.lastActive < 2 * 60 * 1000) {
+                activeLabel = `<span class="ml-2 text-xs text-green-600">(Active now)</span>`;
+            } else if (u.lastActive) {
+                activeLabel = `<span class="ml-2 text-xs text-gray-400">(Last seen: ${new Date(u.lastActive).toLocaleTimeString()})</span>`;
+            }
+            return `
+                <li class="border-b py-2 flex justify-between items-center">
+                    <span>
+                        <span class="font-semibold">${u.email}</span>
+                        ${u.name ? ` - <span>${u.name}</span>` : ''}
+                        ${u.isAdmin ? '<span class="text-xs text-yellow-600 ml-2">(admin)</span>' : ''}
+                        ${activeLabel}
+                    </span>
+                    <button onclick="deleteUserAsAdmin(${u.idx})" class="bg-red-500 text-white px-3 py-1 rounded text-xs" ${u.isAdmin ? 'disabled' : ''}>Delete</button>
+                </li>
+            `;
+        }).join('');
+
+    // Job Management (edit & analytics)
+    const jobList = document.getElementById('adminJobList');
+    jobList.innerHTML = jobs.map(j => {
+        const appCount = allApps.filter(a => a.jobId === j.id).length;
+        return `
+            <li class="border-b py-2 flex justify-between items-center">
+                <span>
+                    <strong>${j.title}</strong> at ${j.company} (${j.location})
+                    
+                </span>
+                <span>
+                    <button onclick="editJobAsAdmin(${j.id})" class="bg-yellow-400 text-white px-3 py-1 rounded text-xs mr-2">Edit</button>
+                    <button onclick="deleteJobAsAdmin(${j.id})" class="bg-red-500 text-white px-3 py-1 rounded text-xs">Delete</button>
+                </span>
+            </li>
+        `;
+    }).join('');
+    if (jobs.length === 0) {
+        jobList.innerHTML = '<li class="text-gray-500">No jobs posted yet.</li>';
+    }
+
+    
+    
+    // Notifications Panel
+const notifList = document.getElementById('adminNotifList');
+const allNotifs = getAllNotifications();
+notifList.innerHTML = allNotifs.length ? allNotifs.map(n => `
+    <li class="border-b py-2 flex justify-between items-center">
+        <span>
+            <span class="font-semibold">${n.user}</span>: ${n.message}
+            <span class="text-xs text-gray-400 ml-2">${n.time}</span>
+        </span>
+        <button onclick="deleteNotificationForUser('${n.user}', '${n.time}')" class="bg-red-500 text-white px-2 py-1 rounded text-xs">Delete</button>
+    </li>
+`).join('') : '<li class="text-gray-500">No notifications yet.</li>';
+
+    // Group Chat 
+    const groupList = document.getElementById('adminGroupChatList');
+    const groupMsgs = getAllGroupMessages();
+    groupList.innerHTML = groupMsgs.length ? groupMsgs.map((msg, idx) => `
+        <li class="border-b py-2 flex justify-between items-center">
+            <span>
+                <span class="font-semibold">${msg.name || msg.email}</span>
+                <span class="text-xs text-gray-400 ml-2">${new Date(msg.time).toLocaleTimeString()}</span>
+                <div class="ml-2">${msg.text}</div>
+            </span>
+            <button onclick="deleteGroupMessage(${idx})" class="bg-red-500 text-white px-2 py-1 rounded text-xs">Delete</button>
+        </li>
+    `).join('') : '<li class="text-gray-500">No group messages yet.</li>';
+}
+
+
+function editJobAsAdmin(jobId) {
+    const job = jobs.find(j => j.id === jobId);
+    if (!job) return;
+    const newTitle = prompt("Edit job title:", job.title);
+    if (newTitle === null) return;
+    job.title = newTitle.trim() || job.title;
+    localStorage.setItem('jobs', JSON.stringify(jobs));
+    renderAdminDashboard();
+    addNotification(`Job "${job.title}" was edited by admin.`);
+}
+function deleteNotificationForUser(userEmail, notifTime) {
+    let notifs = JSON.parse(localStorage.getItem('notifications_' + userEmail) || '[]');
+    notifs = notifs.filter(n => n.time !== notifTime);
+    localStorage.setItem('notifications_' + userEmail, JSON.stringify(notifs));
+    
+    if (getCurrentUserEmail() === userEmail) {
+        notifications = notifs;
+    }
+    renderAdminDashboard();
+}
+
+
+       
+        function getPostedLabel(dateString) {
+    const postedDate = new Date(dateString);
+    
+    return postedDate.toLocaleString(undefined, { 
+        weekday: 'long', year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+    });
+}
+
+
+        
+
+        showSection('home');
+    </script>
+</body>
+<script src="server.js"></script>
+<script></script>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Page</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
+    <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+        <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">Payment Page</h1>
+        <div class="mb-6">
+            <!-- Premium plan details -->
+            <div class="flex justify-between items-center mb-2">
+                <span class="font-semibold text-gray-700">Premium</span>
+                <span class="text-blue-600 font-bold text-lg">$9</span>
+            </div>
+            <ul class="list-disc pl-5 text-gray-700 text-sm">
+                <li>Access to all premium features</li>
+                <li>Priority support</li>
+                <li>No ads</li>
+            </ul>
+            <!-- Free plan details -->
+            <div class="mt-4">
+                <span class="font-semibold text-gray-700">Free</span>
+                <ul class="list-disc pl-5 text-gray-700 text-sm">
+                    <li>Basic features only</li>
+                    <li>Standard support</li>
+                    <li>Contains ads</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Payment form -->
+        <form id="paymentForm" class="space-y-4">
+            <div>
+                <label for="paystack_email" class="block text-gray-700 font-medium mb-1">Email Address:</label>
+                <input type="email" id="paystack_email" name="paystack_email" required class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+            </div>
+            <input type="submit" value="Pay $9 for Premium" class="w-full bg-blue-600 text-white font-semibold py-2 rounded hover:bg-blue-700 transition">
+        </form>
+        <!-- Success message -->
+        <div id="message" class="mt-4 text-center text-green-600 font-semibold hidden"></div>
+        <p class="mt-6 text-center">
+            <a href="sudents.html" class="text-blue-600 hover:underline">Back to Home</a>
+        </p>
+    </div>
+    <footer class="mt-8 text-gray-500 text-sm text-center">
+        &copy; 2025 Payment Portal
+    </footer>
+    <script>
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let email = document.getElementById('paystack_email').value.trim();
+            if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+                alert("Please enter a valid email.");
+                return;
+            }
+            let handler = PaystackPop.setup({
+                key: 'pk_test_36f2094175cf0be5c3039749c08d323d5e6012bf', 
+                email: email,
+                amount: 90000 * 100, 
+                currency : "NGN",
+                ref: ''+Math.floor((Math.random() * 1000000000) + 1),
+                callback: function(response){
+                    document.getElementById('message').textContent = 'Payment successful! Reference: ' + response.reference;
+                    document.getElementById('message').classList.remove('hidden');
+                    document.getElementById('paymentForm').reset();
+                },
+                onClose: function(){
+                    alert('Payment window closed.');
+                }
+            });
+            handler.openIframe();
+        });
+        
+    </script>
+    <div class="mt-6 mb-2 flex items-center justify-center">
+        <span class="inline-flex items-center bg-yellow-100 border border-yellow-300 text-yellow-800 text-sm font-semibold px-4 py-2 rounded shadow-sm">
+        <svg class="w-5 h-5 mr-2 text-yellow-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/>
+        </svg>
+        Note: Use a valid email to receive your payment receipt.
+        </span>
+    </div>
+</body>
+</html>
