@@ -19,6 +19,7 @@
             }
         }
     </script>
+
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Navigation -->
@@ -35,9 +36,13 @@
     <button id="navPaymentBtn" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
         <a href="payment.html">Payment</a>
     </button>
-    <button id="navJobsBtn" onclick="showSection('jobs')" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Browse Jobs</button>
-    <button id="navPostBtn" onclick="showSection('post')" class="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-secondary">Post a Job</button>
-    <button id="navProfileBtn" onclick="showProfile()" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Profile</button>
+    
+   <!-- ...existing code... -->
+<button id="navJobsBtn" onclick="showSection('jobs')" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Browse Jobs</button>
+<button id="navPostBtn" onclick="showSection('post')" class="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-secondary">Post a Job</button>
+<button id="navProfileBtn" onclick="showProfile()" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Profile</button>
+<a href="wallet.html" id="navWalletBtn" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Wallet</a>
+<!-- ...existing code... -->
     <button id="navGroupChatBtn" onclick="window.location.href='groupchat.html'" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Group Chat</button>
     <button id="navNotificationBtn" onclick="toggleNotifications()" class="relative text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,26 +53,36 @@
 </div>
     </div>
 </nav>
-    <!-- Admin Dashboard -->
 <div id="adminDashboard" class="section hidden">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <h2 class="text-3xl font-bold text-primary mb-6">Admin Dashboard</h2>
-        <button onclick="muteUser('${u.email}')" class="bg-yellow-500 text-white px-2 py-1 rounded text-xs">Mute</button>
+        <div id="adminOverviewCards"></div>
         <div class="mb-8">
             <h3 class="text-xl font-semibold mb-2">All Users</h3>
+            <input type="text" id="adminUserSearch" placeholder="Search users..." class="mb-3 border px-2 py-1 rounded w-full max-w-xs">
             <ul id="adminUserList" class="mb-6 bg-white rounded shadow p-4"></ul>
         </div>
-        <div>
+        <div class="mb-8">
             <h3 class="text-xl font-semibold mb-2">All Jobs</h3>
             <ul id="adminJobList" class="bg-white rounded shadow p-4"></ul>
         </div>
-        <div id="adminDashboard" class="section hidden">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-         
-    </div>
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-2">All Notifications</h3>
+            <ul id="adminNotifList" class="bg-white rounded shadow p-4"></ul>
+        </div>
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-2">Group Chat Messages</h3>
+            <ul id="adminGroupChatList" class="bg-white rounded shadow p-4"></ul>
+        </div>
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-2">Wallets & Transfers</h3>
+            <div id="adminWallets"></div>
+        </div>
+        </div>
 </div>
-    </div>
-</div>
+
+   
+
 
     <!-- Notification Panel -->
     <div id="notificationPanel" class="fixed top-16 right-4 w-80 bg-white rounded-xl shadow-2xl border border-primary/20 z-50 hidden transition-all">
@@ -458,52 +473,60 @@ document.addEventListener('DOMContentLoaded', function() {
     
 
     <!-- Profile Section -->
-    <div id="profile" class="section hidden">
-        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div class="relative bg-gradient-to-br from-primary via-blue-400 to-secondary rounded-3xl shadow-2xl p-1">
-                <div class="bg-white rounded-2xl p-8 shadow-lg">
-                    <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
-                        <!-- Avatar -->
-                        <div class="flex-shrink-0">
-                            <div class="w-32 h-32 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-lg border-4 border-white">
-                                <span class="text-5xl font-bold text-white select-none">
-                                    <script>
-                                        // Render initials for avatar
-                                        (function() {
-                                            const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
-                                            if (user && user.name) {
-                                                document.write(user.name.split(' ').map(n => n[0]).join('').toUpperCase());
-                                            } else {
-                                                document.write('U');
-                                            }
-                                        })();
-                                    </script>
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <div class="flex-1">
-                            <h2 class="text-3xl font-extrabold text-primary mb-2" id="profileNameDisplay"></h2>
-                            <p class="text-lg text-gray-700 italic mb-4" id="profileBioDisplay"></p>
-                            <div class="mb-4">
-                                <span class="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full font-semibold text-sm mr-2">Likes</span>
-                                <span class="text-gray-600" id="profileLikesDisplay"></span>
-                            </div>
-                            <div>
-                                <span class="font-semibold text-gray-800">Email:</span>
-                                <span class="text-gray-600" id="profileEmailDisplay"></span>
-                            </div>
-                            <div class="mt-6 flex flex-wrap gap-3">
-                                <button onclick="editProfile()" class="bg-primary text-white px-6 py-2 rounded-md hover:bg-secondary font-medium shadow transition">Edit Profile</button>
-                                <button onclick="logoutProfile()" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-300 font-medium shadow transition">Logout</button>
-                            </div>
-                        </div>
+    
+<div id="profile" class="section hidden">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="relative bg-gradient-to-br from-primary via-blue-400 to-secondary rounded-3xl shadow-2xl p-2">
+            <div class="bg-white rounded-2xl p-10 shadow-lg flex flex-col md:flex-row gap-10 items-start">
+                <!-- Avatar -->
+                <div class="flex-shrink-0 flex flex-col items-center w-full md:w-1/3">
+                    <div class="w-40 h-40 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-lg border-4 border-white mb-4">
+                        <span class="text-6xl font-bold text-white select-none">
+                            <script>
+                                // Render initials for avatar
+                                (function() {
+                                    const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+                                    if (user && user.name) {
+                                        document.write(user.name.split(' ').map(n => n[0]).join('').toUpperCase());
+                                    } else {
+                                        document.write('U');
+                                    }
+                                })();
+                            </script>
+                        </span>
+                    </div>
+                    <!-- Set/Change Wallet PIN -->
+                    <div class="w-full">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Wallet PIN</label>
+                        <input type="password" id="setPin" maxlength="6" class="w-full border border-gray-300 rounded-md px-3 py-2" placeholder="Enter new PIN">
+                        <button onclick="saveWalletPin()" class="bg-primary text-white px-4 py-2 rounded-md mt-2 w-full">Save PIN</button>
+                        <div id="pinStatus" class="mt-2 text-sm"></div>
+                    </div>
+                </div>
+                <!-- Profile Info -->
+                <div class="flex-1 w-full">
+                    <h2 class="text-4xl font-extrabold text-primary mb-3" id="profileNameDisplay"></h2>
+                    <p class="text-lg text-gray-700 italic mb-4" id="profileBioDisplay"></p>
+                    <div class="mb-4">
+                        <span class="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full font-semibold text-sm mr-2">Likes</span>
+                        <span class="text-gray-600" id="profileLikesDisplay"></span>
+                    </div>
+                    <div>
+                        <span class="font-semibold text-gray-800">Email:</span>
+                        <span class="text-gray-600" id="profileEmailDisplay"></span>
+                    </div>
+                    <div class="mt-8 flex flex-wrap gap-4">
+                        <button onclick="editProfile()" class="bg-primary text-white px-8 py-3 rounded-md hover:bg-secondary font-medium shadow transition">Edit Profile</button>
+                        <button onclick="logoutProfile()" class="bg-gray-200 text-gray-700 px-8 py-3 rounded-md hover:bg-gray-300 font-medium shadow transition">Logout</button>
+                        <button id="changePasswordBtn" onclick="openChangePasswordModal()" class="bg-yellow-500 text-white px-8 py-3 rounded-md hover:bg-yellow-600 font-medium shadow transition">Change Password</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+</div>
+     
+    
     
     <div id="editProfileModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
@@ -621,49 +644,213 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     </script>
+    <!-- SIGN UP SECTION -->
+<div id="signup" class="section hidden">
+    <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Sign Up</h2>
+            <form onsubmit="signup(event)" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="signupEmail" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="signupPassword" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Security Question</label>
+                    <input type="text" id="signupSecurityQuestion" required class="w-full border border-gray-300 rounded-md px-3 py-2" placeholder="e.g. Your favorite color?">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Security Answer</label>
+                    <input type="text" id="signupSecurityAnswer" required class="w-full border border-gray-300 rounded-md px-3 py-2" placeholder="Answer">
+                </div>
+                <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-md hover:bg-secondary font-medium">Sign Up</button>
+            </form>
+            <p class="mt-4 text-sm text-gray-600">Already have an account? <a href="#" onclick="showSection('login')" class="text-primary hover:underline">Login</a></p>
+        </div>
+    </div>
+</div>
+
+<!-- LOGIN SECTION -->
+<div id="login" class="section hidden">
+    <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Login</h2>
+            <form onsubmit="login(event)" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="loginEmail" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="loginPassword" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+                <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-md hover:bg-secondary font-medium">Login</button>
+                <button type="button" onclick="openResetPasswordModal()" class="w-full mt-2 bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 font-medium">Forgot Password?</button>
+            </form>
+            <p class="mt-4 text-sm text-gray-600">Don't have an account? <a href="#" onclick="showSection('signup')" class="text-primary hover:underline">Sign Up</a></p>
+        </div>
+    </div>
+</div>
+
+<!-- RESET PASSWORD MODAL -->
+<div id="resetPasswordModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">Reset Password</h3>
+        <form onsubmit="resetPassword(event)">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="resetEmail" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+                <div id="securityQuestionDiv" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-2" id="securityQuestionLabel"></label>
+                    <input type="text" id="resetSecurityAnswer" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+                <div id="newPasswordDiv" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                    <input type="password" id="resetNewPassword" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+            </div>
+            <div class="mt-6 flex space-x-3">
+                <button type="submit" class="flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary">Reset</button>
+                <button type="button" onclick="closeResetPasswordModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400">Cancel</button>
+            </div>
+            <div id="resetPasswordStatus" class="mt-4 text-center text-sm"></div>
+        </form>
+    </div>
+</div>
+
+<script>
+// --- Helper Functions ---
+function getUsers() {
+    return JSON.parse(localStorage.getItem('users') || '[]');
+}
+function setUsers(users) {
+    localStorage.setItem('users', JSON.stringify(users));
+}
+function getCurrentUser() {
+    return JSON.parse(localStorage.getItem('currentUser') || 'null');
+}
+function setCurrentUser(user) {
+    localStorage.setItem('currentUser', JSON.stringify(user));
+}
+function showSection(section) {
+    document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+    document.getElementById(section).classList.remove('hidden');
+}
+
+// --- SIGN UP ---
+function signup(event) {
+    event.preventDefault();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const securityQuestion = document.getElementById('signupSecurityQuestion').value.trim();
+    const securityAnswer = document.getElementById('signupSecurityAnswer').value.trim().toLowerCase();
+    let users = getUsers();
+    if (users.find(u => u.email === email)) {
+        alert('Email already registered.');
+        return;
+    }
+    const user = { email, password, name: '', bio: '', likes: [], securityQuestion, securityAnswer };
+    if (email === "admin@brexbin.com") user.isAdmin = true;
+    users.push(user);
+    setUsers(users);
+    setCurrentUser(user);
+    alert('Signup successful! Please complete your profile.');
+    showSection('profile');
+}
+
+// --- LOGIN ---
+function login(event) {
+    event.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    let users = getUsers();
+    const user = users.find(u => u.email === email && u.password === password);
+    if (!user) {
+        alert('Invalid email or password.');
+        return;
+    }
+    setCurrentUser(user);
+    showSection('profile');
+}
+
+// --- RESET PASSWORD ---
+let resetUser = null;
+function openResetPasswordModal() {
+    document.getElementById('resetPasswordModal').classList.remove('hidden');
+    document.getElementById('resetPasswordModal').classList.add('flex');
+    document.getElementById('resetEmail').value = '';
+    document.getElementById('securityQuestionDiv').classList.add('hidden');
+    document.getElementById('newPasswordDiv').classList.add('hidden');
+    document.getElementById('resetPasswordStatus').textContent = '';
+    resetUser = null;
+}
+function closeResetPasswordModal() {
+    document.getElementById('resetPasswordModal').classList.add('hidden');
+    document.getElementById('resetPasswordModal').classList.remove('flex');
+    resetUser = null;
+}
+function resetPassword(event) {
+    event.preventDefault();
+    const email = document.getElementById('resetEmail').value.trim();
+    const users = getUsers();
+    const status = document.getElementById('resetPasswordStatus');
+    if (!resetUser) {
+        // Step 1: Find user and show security question
+        const user = users.find(u => u.email === email);
+        if (!user) {
+            status.textContent = "No account found with that email.";
+            status.className = "text-red-500 mt-2";
+            return;
+        }
+        resetUser = user;
+        document.getElementById('securityQuestionLabel').textContent = user.securityQuestion;
+        document.getElementById('securityQuestionDiv').classList.remove('hidden');
+        status.textContent = "Answer your security question to continue.";
+        status.className = "text-gray-700 mt-2";
+        return;
+    }
+    if (resetUser && !document.getElementById('newPasswordDiv').classList.contains('hidden')) {
+        // Step 3: Set new password
+        const newPass = document.getElementById('resetNewPassword').value;
+        if (newPass.length < 4) {
+            status.textContent = "Password must be at least 4 characters.";
+            status.className = "text-red-500 mt-2";
+            return;
+        }
+        resetUser.password = newPass;
+        let users = getUsers();
+        users = users.map(u => u.email === resetUser.email ? resetUser : u);
+        setUsers(users);
+        status.textContent = "Password reset successful! You can now log in.";
+        status.className = "text-green-600 mt-2";
+        setTimeout(() => {
+            closeResetPasswordModal();
+            resetUser = null;
+        }, 1500);
+        return;
+    }
+    // Step 2: Check security answer
+    const answer = document.getElementById('resetSecurityAnswer').value.trim().toLowerCase();
+if (answer !== (resetUser.securityAnswer || '').toLowerCase()) {
+    status.textContent = "Incorrect answer. Try again.";
+    status.className = "text-red-500 mt-2";
+    return;
+}
+    document.getElementById('newPasswordDiv').classList.remove('hidden');
+    status.textContent = "Enter your new password.";
+    status.className = "text-gray-700 mt-2";
+}
+</script>
     
 
-    <!-- Sign Up Page -->
-    <div id="signup" class="section hidden">
-        <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div class="bg-white rounded-lg shadow-lg p-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Sign Up</h2>
-                <form onsubmit="signup(event)" class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                        <input type="email" id="signupEmail" required class="w-full border border-gray-300 rounded-md px-3 py-2">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                        <input type="password" id="signupPassword" required class="w-full border border-gray-300 rounded-md px-3 py-2">
-                    </div>
-                    <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-md hover:bg-secondary font-medium">Sign Up</button>
-                </form>
-                <p class="mt-4 text-sm text-gray-600">Already have an account? <a href="#" onclick="showSection('login')" class="text-primary hover:underline">Login</a></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Login Page -->
-    <div id="login" class="section hidden">
-        <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div class="bg-white rounded-lg shadow-lg p-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Login</h2>
-                <form onsubmit="login(event)" class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                        <input type="email" id="loginEmail" required class="w-full border border-gray-300 rounded-md px-3 py-2">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                        <input type="password" id="loginPassword" required class="w-full border border-gray-300 rounded-md px-3 py-2">
-                    </div>
-                    <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-md hover:bg-secondary font-medium">Login</button>
-                </form>
-                <p class="mt-4 text-sm text-gray-600">Don't have an account? <a href="#" onclick="showSection('signup')" class="text-primary hover:underline">Sign Up</a></p>
-            </div>
-        </div>
-    </div>
+    
+    
+  
 
     
     <div id="applicationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
@@ -701,10 +888,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <button type="submit" class="flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary">Submit Application</button>
                     <button type="button" onclick="closeModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400">Cancel</button>
                 </div>
-            </form>
-        </div>
-    </div>
-
+               
     <script>
         
         
@@ -906,24 +1090,7 @@ function setNotifications(notifs) {
         }
         
 
-        function signup(event) {
-            event.preventDefault();
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value;
-            let users = getUsers();
-            if (users.find(u => u.email === email)) {
-                alert('Email already registered.');
-                return;
-            }
-            const user = { email, password, name: '', bio: '', likes: [] };
-            users.push(user);
-            setUsers(users);
-            setCurrentUser(user);
-            alert('Signup successful! Please complete your profile.');
-            showProfile();
-            addNotification("Welcome to Brexbin ! 🎉");
-        }
-
+     
         function login(event) {
             event.preventDefault();
             const email = document.getElementById('loginEmail').value.trim();
@@ -1611,25 +1778,7 @@ function deleteJobAsAdmin(jobId) {
     renderAdminDashboard();
     addNotification("Job deleted by admin.");
 }
-function signup(event) {
-    event.preventDefault();
-    const email = document.getElementById('signupEmail').value.trim();
-    const password = document.getElementById('signupPassword').value;
-    let users = getUsers();
-    if (users.find(u => u.email === email)) {
-        alert('Email already registered.');
-        return;
-    }
-    const user = { email, password, name: '', bio: '', likes: [] };
-    
-    if (email === "admin@brexbin.com") user.isAdmin = true;
-    users.push(user);
-    setUsers(users);
-    setCurrentUser(user);
-    alert('Signup successful! Please complete your profile.');
-    showProfile();
-    addNotification("Welcome to Brexbin ! 🎉");
-}
+
 function updateNavVisibility() {
     const user = getCurrentUser();
     const navIds = [
@@ -1641,7 +1790,8 @@ function updateNavVisibility() {
         "calendarNavBtn",
         "calculatorNavBtn",
         "navPaymentBtn",
-        "navGroupChatBtn"
+        "navGroupChatBtn",
+        "navWalletBtn"
     ];
     navIds.forEach(id => {
         const btn = document.getElementById(id);
@@ -1748,15 +1898,17 @@ function deleteGroupMessage(idx) {
     renderAdminDashboard();
 }
 
-// --- Admin Dashboard Render ---
 
-let adminUserSearchValue = ""; 
 
+
+// --- Admin Dashboard Logic ---
+let adminUserSearchValue = "";
 function renderAdminDashboard() {
     // Overview Cards
     const allApps = getAllApplications();
     const users = getUsers();
     const activeToday = getActiveUsersToday();
+    const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
     const overviewHTML = `
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
             <div class="bg-primary text-white rounded-lg p-4 text-center">
@@ -1767,7 +1919,6 @@ function renderAdminDashboard() {
                 <div class="text-2xl font-bold">${jobs.length}</div>
                 <div class="text-sm">Total Jobs</div>
             </div>
-            
             <div class="bg-green-500 text-white rounded-lg p-4 text-center">
                 <div class="text-2xl font-bold">${activeToday}</div>
                 <div class="text-sm">Active Today</div>
@@ -1778,31 +1929,12 @@ function renderAdminDashboard() {
             </div>
         </div>
     `;
-    document.querySelector("#adminDashboard .max-w-5xl").innerHTML = `
-        <h2 class="text-3xl font-bold text-primary mb-6">Admin Dashboard</h2>
-        ${overviewHTML}
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-2">All Users</h3>
-            <input type="text" id="adminUserSearch" value="${adminUserSearchValue}" placeholder="Search users..." class="mb-3 border px-2 py-1 rounded w-full max-w-xs">
-            <ul id="adminUserList" class="mb-6 bg-white rounded shadow p-4"></ul>
-        </div>
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-2">All Jobs</h3>
-            <ul id="adminJobList" class="bg-white rounded shadow p-4"></ul>
-        </div>
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-2">All Notifications</h3>
-            <ul id="adminNotifList" class="bg-white rounded shadow p-4"></ul>
-        </div>
-        <div class="mb-8">
-            <h3 class="text-xl font-semibold mb-2">Group Chat Messages</h3>
-            <ul id="adminGroupChatList" class="bg-white rounded shadow p-4"></ul>
-        </div>
-    `;
+    document.getElementById("adminOverviewCards").innerHTML = overviewHTML;
 
-    
+    // Users
     const userList = document.getElementById('adminUserList');
     const searchInput = document.getElementById('adminUserSearch');
+    searchInput.value = adminUserSearchValue;
     searchInput.oninput = function() {
         adminUserSearchValue = this.value;
         renderAdminDashboard();
@@ -1831,7 +1963,7 @@ function renderAdminDashboard() {
             `;
         }).join('');
 
-    // Job Management (edit & analytics)
+    // Jobs
     const jobList = document.getElementById('adminJobList');
     jobList.innerHTML = jobs.map(j => {
         const appCount = allApps.filter(a => a.jobId === j.id).length;
@@ -1839,7 +1971,6 @@ function renderAdminDashboard() {
             <li class="border-b py-2 flex justify-between items-center">
                 <span>
                     <strong>${j.title}</strong> at ${j.company} (${j.location})
-                    
                 </span>
                 <span>
                     <button onclick="editJobAsAdmin(${j.id})" class="bg-yellow-400 text-white px-3 py-1 rounded text-xs mr-2">Edit</button>
@@ -1847,10 +1978,145 @@ function renderAdminDashboard() {
                 </span>
             </li>
         `;
-    }).join('');
-    if (jobs.length === 0) {
-        jobList.innerHTML = '<li class="text-gray-500">No jobs posted yet.</li>';
+    }).join('') || '<li class="text-gray-500">No jobs posted yet.</li>';
+
+    // Notifications
+    const notifList = document.getElementById('adminNotifList');
+    const allNotifs = getAllNotifications();
+    notifList.innerHTML = allNotifs.length ? allNotifs.map(n => `
+        <li class="border-b py-2 flex justify-between items-center">
+            <span>
+                <span class="font-semibold">${n.user}</span>: ${n.message}
+                <span class="text-xs text-gray-400 ml-2">${n.time}</span>
+            </span>
+            <button onclick="deleteNotificationForUser('${n.user}', '${n.time}')" class="bg-red-500 text-white px-2 py-1 rounded text-xs">Delete</button>
+        </li>
+    `).join('') : '<li class="text-gray-500">No notifications yet.</li>';
+
+    // Group Chat
+    const groupList = document.getElementById('adminGroupChatList');
+    const groupMsgs = getAllGroupMessages();
+    groupList.innerHTML = groupMsgs.length ? groupMsgs.map((msg, idx) => `
+        <li class="border-b py-2 flex justify-between items-center">
+            <span>
+                <span class="font-semibold">${msg.name || msg.email}</span>
+                <span class="text-xs text-gray-400 ml-2">${new Date(msg.time).toLocaleTimeString()}</span>
+                <div class="ml-2">${msg.text}</div>
+            </span>
+            <button onclick="deleteGroupMessage(${idx})" class="bg-red-500 text-white px-2 py-1 rounded text-xs">Delete</button>
+        </li>
+    `).join('') : '<li class="text-gray-500">No group messages yet.</li>';
+
+    // Wallets & Transfers
+    renderAdminWallets();
+}
+
+// --- Wallets & Transfers ---
+function renderAdminWallets() {
+    const users = getUsers().filter(u => !u.isAdmin);
+    let html = `
+        <table class="w-full text-left mb-4">
+            <thead>
+                <tr>
+                    <th class="py-2">User</th>
+                    <th class="py-2">Naira (₦)</th>
+                    <th class="py-2">USD ($)</th>
+                    <th class="py-2">Transfer</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${users.map(u => {
+                    const w = JSON.parse(localStorage.getItem('wallet_' + u.email) || '{"naira":0,"usd":0,"transactions":[]}');
+                    return `
+                        <tr>
+                            <td class="py-2">${u.email}</td>
+                            <td class="py-2">${w.naira}</td>
+                            <td class="py-2">${w.usd}</td>
+                            <td class="py-2">
+                                <button onclick="showTransferModal('${u.email}','naira')" class="bg-primary text-white px-2 py-1 rounded text-xs mr-1">Send ₦</button>
+                                <button onclick="showTransferModal('${u.email}','usd')" class="bg-secondary text-white px-2 py-1 rounded text-xs">Send $</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('')}
+            </tbody>
+        </table>
+        <div id="adminTransferModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+                <h3 class="text-xl font-bold text-gray-900 mb-4" id="transferTitle">Transfer</h3>
+                <form id="transferForm" class="space-y-4" onsubmit="adminTransfer(event)">
+                    <input type="hidden" id="transferUserEmail">
+                    <input type="hidden" id="transferCurrency">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Amount</label>
+                        <input type="number" id="transferAmount" min="1" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    <div class="flex space-x-3">
+                        <button type="submit" class="flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary">Send</button>
+                        <button type="button" onclick="closeTransferModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400">Cancel</button>
+                    </div>
+                </form>
+                <div id="transferStatus" class="mt-4 text-center text-sm"></div>
+            </div>
+        </div>
+    `;
+    document.getElementById('adminWallets').innerHTML = html;
+}
+function showTransferModal(email, currency) {
+    document.getElementById('adminTransferModal').classList.remove('hidden');
+    document.getElementById('adminTransferModal').classList.add('flex');
+    document.getElementById('transferUserEmail').value = email;
+    document.getElementById('transferCurrency').value = currency;
+    document.getElementById('transferAmount').value = '';
+    document.getElementById('transferStatus').textContent = '';
+    document.getElementById('transferTitle').textContent = `Transfer to ${email} (${currency === 'naira' ? '₦' : '$'})`;
+}
+function closeTransferModal() {
+    document.getElementById('adminTransferModal').classList.add('hidden');
+    document.getElementById('adminTransferModal').classList.remove('flex');
+}
+function adminTransfer(event) {
+    event.preventDefault();
+    const email = document.getElementById('transferUserEmail').value;
+    const currency = document.getElementById('transferCurrency').value;
+    const amount = parseFloat(document.getElementById('transferAmount').value);
+    let status = document.getElementById('transferStatus');
+    if (isNaN(amount) || amount <= 0) {
+        status.textContent = "Enter a valid amount.";
+        status.className = "mt-4 text-center text-sm text-red-500";
+        return;
     }
+    let wallet = JSON.parse(localStorage.getItem('wallet_' + email) || '{"naira":0,"usd":0,"transactions":[]}');
+    wallet[currency] += amount;
+    wallet.transactions.unshift({
+        type: 'credit',
+        currency,
+        amount,
+        time: new Date().toLocaleString(),
+        details: `Admin transfer`
+    });
+    localStorage.setItem('wallet_' + email, JSON.stringify(wallet));
+    // Notify user
+    let notifs = JSON.parse(localStorage.getItem('notifications_' + email) || '[]');
+    notifs.unshift({
+        id: Date.now(),
+        message: `Admin sent you ${currency === 'naira' ? '₦' : '$'}${amount}.`,
+        time: new Date().toLocaleString(),
+        read: false
+    });
+    localStorage.setItem('notifications_' + email, JSON.stringify(notifs));
+    status.textContent = `Transfer successful!`;
+    status.className = "mt-4 text-center text-sm text-green-600";
+    setTimeout(() => {
+        closeTransferModal();
+        renderAdminWallets();
+    }, 1200);
+}
+
+
+
+
+
 
     
     
@@ -1880,7 +2146,7 @@ notifList.innerHTML = allNotifs.length ? allNotifs.map(n => `
             <button onclick="deleteGroupMessage(${idx})" class="bg-red-500 text-white px-2 py-1 rounded text-xs">Delete</button>
         </li>
     `).join('') : '<li class="text-gray-500">No group messages yet.</li>';
-}
+
 
 
 function editJobAsAdmin(jobId) {
@@ -1903,6 +2169,30 @@ function deleteNotificationForUser(userEmail, notifTime) {
     }
     renderAdminDashboard();
 }
+function saveWalletPin() {
+    const user = getCurrentUser();
+    const pin = document.getElementById('setPin').value;
+    const status = document.getElementById('pinStatus');
+    if (!pin || pin.length < 4) {
+        status.textContent = "PIN must be at least 4 digits.";
+        status.className = "text-red-500 mt-2";
+        return;
+    }
+    user.pin = pin;
+    setCurrentUser(user);
+    let users = getUsers();
+    let idx = users.findIndex(u => u.email === user.email);
+    if (idx !== -1) {
+        users[idx].pin = pin;
+        setUsers(users);
+    }
+    status.textContent = "PIN saved successfully!";
+    status.className = "text-green-600 mt-2";
+}
+
+
+
+
 
 
        
