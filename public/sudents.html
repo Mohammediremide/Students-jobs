@@ -788,6 +788,9 @@ function setCurrentUser(user) {
     localStorage.setItem('currentUser', JSON.stringify(user));
 }
 async function apiRequest(path, options = {}) {
+    if (window.location.protocol === 'file:') {
+        throw new Error('Failed to fetch. Open the site via http(s), not file://');
+    }
     const config = {
         method: options.method || 'GET',
         headers: {
@@ -798,7 +801,12 @@ async function apiRequest(path, options = {}) {
     if (options.body !== undefined) {
         config.body = typeof options.body === 'string' ? options.body : JSON.stringify(options.body);
     }
-    const response = await fetch(path, config);
+    let response;
+    try {
+        response = await fetch(path, config);
+    } catch (err) {
+        throw new Error('Failed to fetch. Check your connection or server URL.');
+    }
     let data = {};
     try {
         data = await response.json();
