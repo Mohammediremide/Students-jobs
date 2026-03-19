@@ -737,13 +737,36 @@ function getCurrentUser() {
 function setCurrentUser(user) {
     localStorage.setItem('currentUser', JSON.stringify(user));
 }
+async function apiRequest(path, options = {}) {
+    const config = {
+        method: options.method || 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            ...(options.headers || {})
+        }
+    };
+    if (options.body !== undefined) {
+        config.body = typeof options.body === 'string' ? options.body : JSON.stringify(options.body);
+    }
+    const response = await fetch(path, config);
+    let data = {};
+    try {
+        data = await response.json();
+    } catch {
+        data = {};
+    }
+    if (!response.ok) {
+        throw new Error(data.message || 'Request failed.');
+    }
+    return data;
+}
 function showSection(section) {
     document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
     document.getElementById(section).classList.remove('hidden');
 }
 
 // --- SIGN UP ---
-function signup(event) {
+async function signup(event) {
     event.preventDefault();
     const email = document.getElementById('signupEmail').value.trim();
     const password = document.getElementById('signupPassword').value;
@@ -754,28 +777,46 @@ function signup(event) {
         alert('Email already registered.');
         return;
     }
-    const user = { email, password, name: '', bio: '', likes: [], securityQuestion, securityAnswer };
-    if (email === "admin@brexbin.com") user.isAdmin = true;
-    users.push(user);
-    setUsers(users);
-    setCurrentUser(user);
-    alert('Signup successful! Please complete your profile.');
-    showSection('profile');
+    try {
+        await apiRequest('/register', {
+            method: 'POST',
+            body: { email, password, securityQuestion, securityAnswer }
+        });
+        const user = { email, password, name: '', bio: '', likes: [], securityQuestion, securityAnswer };
+        if (email === "admin@brexbin.com") user.isAdmin = true;
+        users.push(user);
+        setUsers(users);
+        setCurrentUser(user);
+        alert('Signup successful! Please complete your profile.');
+        showSection('profile');
+    } catch (error) {
+        alert(error.message);
+    }
 }
 
 // --- LOGIN ---
-function login(event) {
+async function login(event) {
     event.preventDefault();
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
-    let users = getUsers();
-    const user = users.find(u => u.email === email && u.password === password);
-    if (!user) {
-        alert('Invalid email or password.');
-        return;
+    try {
+        const result = await apiRequest('/login', {
+            method: 'POST',
+            body: { email, password }
+        });
+        let users = getUsers();
+        let user = users.find(u => u.email === email);
+        if (!user) {
+            user = { email, password, name: '', bio: '', likes: [] };
+            users.push(user);
+        }
+        user.isAdmin = result.user && result.user.isAdmin === true;
+        setUsers(users);
+        setCurrentUser(user);
+        showSection('profile');
+    } catch (error) {
+        alert(error.message);
     }
-    setCurrentUser(user);
-    showSection('profile');
 }
 
 // --- RESET PASSWORD ---
@@ -1091,24 +1132,40 @@ function setNotifications(notifs) {
         
 
      
-        function login(event) {
+        async function login(event) {
             event.preventDefault();
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
-            let users = getUsers();
-            const user = users.find(u => u.email === email && u.password === password);
-            if (!user) {
-                alert('Invalid email or password.');
-                return;
+            try {
+                const result = await apiRequest('/login', {
+                    method: 'POST',
+                    body: { email, password }
+                });
+                let users = getUsers();
+                let user = users.find(u => u.email === email);
+                if (!user) {
+                    user = { email, password, name: '', bio: '', likes: [] };
+                    users.push(user);
+                }
+                user.isAdmin = result.user && result.user.isAdmin === true;
+                setUsers(users);
+                setCurrentUser(user);
+                showProfile();
+            } catch (error) {
+                alert(error.message);
             }
-            setCurrentUser(user);
-            showProfile();
         }
 
         function showSection(section) {
             document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
             document.getElementById(section).classList.remove('hidden');
-            if (section === 'jobs') displayJobs(jobs); 
+            if (section === 'jobs') {
+                if (jobs.length === 0) {
+                    loadJobs().then(() => displayJobs(jobs));
+                } else {
+                    displayJobs(jobs);
+                }
+            }
             if (section === 'profile') renderProfile();
 }
 
@@ -1120,6 +1177,7 @@ function setNotifications(notifs) {
             } else {
                 showSection('login');
             }
+            loadJobs();
             updateNotificationDot();
         });
 
@@ -1488,11 +1546,23 @@ function setNotifications(notifs) {
         
 
 let jobs = [];
-if (localStorage.getItem('jobs')) {
-    jobs = JSON.parse(localStorage.getItem('jobs'));
-} else {
-    jobs = defaultJobs;
-    localStorage.setItem('jobs', JSON.stringify(jobs));
+async function loadJobs() {
+    try {
+        const data = await apiRequest('/jobs');
+        if (Array.isArray(data)) {
+            jobs = data;
+            localStorage.setItem('jobs', JSON.stringify(jobs));
+            return;
+        }
+    } catch (error) {
+        console.warn('Falling back to local jobs:', error.message);
+    }
+    if (localStorage.getItem('jobs')) {
+        jobs = JSON.parse(localStorage.getItem('jobs'));
+    } else {
+        jobs = defaultJobs;
+        localStorage.setItem('jobs', JSON.stringify(jobs));
+    }
 }
 
         
@@ -1677,29 +1747,41 @@ if (localStorage.getItem('jobs')) {
 
         
 
-function postJob(event) {
+async function postJob(event) {
     event.preventDefault();
 
     const newJob = {
-        id: jobs.length + 1,
         title: document.getElementById('jobTitle').value,
         company: document.getElementById('company').value,
         category: document.getElementById('jobCategory').value,
         pay: parseInt(document.getElementById('hourlyPay').value),
         location: document.getElementById('location').value,
+        country: "United States",
         description: document.getElementById('description').value,
         requirements: document.getElementById('requirements').value,
         contact: document.getElementById('contactEmail').value,
         posted: new Date().toLocaleString()
     };
 
-    jobs.unshift(newJob);
-    localStorage.setItem('jobs', JSON.stringify(jobs)); 
-
-    alert('Job posted successfully! It will appear in the job listings.');
-    event.target.reset();
-    showSection('jobs');
-    addNotification(`New job posted: ${newJob.title}`);
+    try {
+        const saved = await apiRequest('/jobs', {
+            method: 'POST',
+            body: newJob
+        });
+        jobs.unshift(saved);
+        localStorage.setItem('jobs', JSON.stringify(jobs));
+        alert('Job posted successfully! It will appear in the job listings.');
+        event.target.reset();
+        showSection('jobs');
+        addNotification(`New job posted: ${saved.title}`);
+    } catch (error) {
+        jobs.unshift(newJob);
+        localStorage.setItem('jobs', JSON.stringify(jobs));
+        alert('Job posted locally. Server save failed: ' + error.message);
+        event.target.reset();
+        showSection('jobs');
+        addNotification(`New job posted: ${newJob.title}`);
+    }
 }
 // Save application
 function saveApplication(jobId, jobTitle, status) {
@@ -1802,20 +1884,30 @@ function updateNavVisibility() {
 }
 
 
-function login(event) {
+async function login(event) {
     event.preventDefault();
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
-    let users = getUsers();
-    const user = users.find(u => u.email === email && u.password === password);
-    if (!user) {
-        alert('Invalid email or password.');
-        return;
+    try {
+        const result = await apiRequest('/login', {
+            method: 'POST',
+            body: { email, password }
+        });
+        let users = getUsers();
+        let user = users.find(u => u.email === email);
+        if (!user) {
+            user = { email, password, name: '', bio: '', likes: [] };
+            users.push(user);
+        }
+        user.isAdmin = result.user && result.user.isAdmin === true;
+        setUsers(users);
+        setCurrentUser(user);
+        showProfile();
+        updateNavVisibility();
+        document.dispatchEvent(new Event('DOMContentLoaded')); 
+    } catch (error) {
+        alert(error.message);
     }
-    setCurrentUser(user);
-    showProfile();
-    updateNavVisibility();
-    document.dispatchEvent(new Event('DOMContentLoaded')); 
 }
 
 function logoutProfile() {
