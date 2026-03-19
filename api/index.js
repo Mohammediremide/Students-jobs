@@ -49,7 +49,7 @@ async function initDb() {
   dbReady = true;
 }
 
-const defaultJobs = [
+const defaultJobs = [];
 
 async function seedJobsIfEmpty() {
   const { rows } = await pool.query('SELECT COUNT(*)::int AS count FROM jobs');
