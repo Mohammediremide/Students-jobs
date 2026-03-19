@@ -24,35 +24,52 @@
 <body class="bg-gray-50 min-h-screen">
     <!-- Navigation -->
     <nav class="bg-white shadow-lg">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <h1 class="text-2xl font-bold text-primary">Brexbin</h1>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-primary">Brexbin</h1>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <button id="mobileMenuBtn" onclick="toggleMobileMenu()" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                    <div class="hidden md:flex items-center space-x-4">
+                        <button id="navHomeBtn" onclick="showSection('home')" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Home</button>
+                        <button id="navPaymentBtn" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+                            <a href="payment.html">Payment</a>
+                        </button>
+                        <button id="navJobsBtn" onclick="showSection('jobs')" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Browse Jobs</button>
+                        <button id="navPostBtn" onclick="showSection('post')" class="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-secondary">Post a Job</button>
+                        <button id="navProfileBtn" onclick="showProfile()" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Profile</button>
+                        <a href="wallet.html" id="navWalletBtn" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Wallet</a>
+                        <button id="navGroupChatBtn" onclick="window.location.href='groupchat.html'" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Group Chat</button>
+                        <button id="navNotificationBtn" onclick="toggleNotifications()" class="relative text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM19 12H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v5a2 2 0 01-2 2z"/>
+                            </svg>
+                            <span id="notificationDot" class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full hidden"></span>
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="flex items-center space-x-4">
-    <button id="navHomeBtn" onclick="showSection('home')" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Home</button>
-    <button id="navPaymentBtn" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
-        <a href="payment.html">Payment</a>
-    </button>
-    
-   <!-- ...existing code... -->
-<button id="navJobsBtn" onclick="showSection('jobs')" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Browse Jobs</button>
-<button id="navPostBtn" onclick="showSection('post')" class="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-secondary">Post a Job</button>
-<button id="navProfileBtn" onclick="showProfile()" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Profile</button>
-<a href="wallet.html" id="navWalletBtn" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Wallet</a>
-<!-- ...existing code... -->
-    <button id="navGroupChatBtn" onclick="window.location.href='groupchat.html'" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Group Chat</button>
-    <button id="navNotificationBtn" onclick="toggleNotifications()" class="relative text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM19 12H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v5a2 2 0 01-2 2z"/>
-        </svg>
-        <span id="notificationDot" class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full hidden"></span>
-    </button>
-</div>
-    </div>
-</nav>
+        </div>
+        <div id="mobileMenu" class="md:hidden hidden border-t border-gray-100">
+            <div class="px-4 py-3 space-y-2">
+                <button onclick="showSection('home'); toggleMobileMenu(false)" class="w-full text-left text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Home</button>
+                <a href="payment.html" onclick="toggleMobileMenu(false)" class="block w-full text-left text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Payment</a>
+                <button onclick="showSection('jobs'); toggleMobileMenu(false)" class="w-full text-left text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Browse Jobs</button>
+                <button onclick="showSection('post'); toggleMobileMenu(false)" class="w-full text-left bg-primary text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-secondary">Post a Job</button>
+                <button onclick="showProfile(); toggleMobileMenu(false)" class="w-full text-left text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Profile</button>
+                <a href="wallet.html" onclick="toggleMobileMenu(false)" class="block w-full text-left text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Wallet</a>
+                <button onclick="window.location.href='groupchat.html'" class="w-full text-left text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Group Chat</button>
+                <button onclick="toggleNotifications(); toggleMobileMenu(false)" class="w-full text-left text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Notifications</button>
+            </div>
+        </div>
+    </nav>
 <div id="adminDashboard" class="section hidden">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <h2 class="text-3xl font-bold text-primary mb-6">Admin Dashboard</h2>
@@ -668,6 +685,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-md hover:bg-secondary font-medium">Sign Up</button>
             </form>
+            <div id="signupStatus" class="mt-4 text-center text-sm"></div>
             <p class="mt-4 text-sm text-gray-600">Already have an account? <a href="#" onclick="showSection('login')" class="text-primary hover:underline">Login</a></p>
         </div>
     </div>
@@ -690,6 +708,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-md hover:bg-secondary font-medium">Login</button>
                 <button type="button" onclick="openResetPasswordModal()" class="w-full mt-2 bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 font-medium">Forgot Password?</button>
             </form>
+            <div id="loginStatus" class="mt-4 text-center text-sm"></div>
             <p class="mt-4 text-sm text-gray-600">Don't have an account? <a href="#" onclick="showSection('signup')" class="text-primary hover:underline">Sign Up</a></p>
         </div>
     </div>
@@ -760,6 +779,26 @@ async function apiRequest(path, options = {}) {
     }
     return data;
 }
+function showStatus(elementId, message, isError) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    if (el._timerId) clearTimeout(el._timerId);
+    el.textContent = message;
+    el.className = `mt-4 text-center text-sm ${isError ? 'text-red-500' : 'text-green-600'}`;
+    el._timerId = setTimeout(() => {
+        el.textContent = '';
+    }, 10000);
+}
+function toggleMobileMenu(forceState) {
+    const menu = document.getElementById('mobileMenu');
+    if (!menu) return;
+    const shouldOpen = typeof forceState === 'boolean' ? forceState : menu.classList.contains('hidden');
+    if (shouldOpen) {
+        menu.classList.remove('hidden');
+    } else {
+        menu.classList.add('hidden');
+    }
+}
 function showSection(section) {
     document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
     document.getElementById(section).classList.remove('hidden');
@@ -774,7 +813,7 @@ async function signup(event) {
     const securityAnswer = document.getElementById('signupSecurityAnswer').value.trim().toLowerCase();
     let users = getUsers();
     if (users.find(u => u.email === email)) {
-        alert('Email already registered.');
+        showStatus('signupStatus', 'Email already registered.', true);
         return;
     }
     try {
@@ -787,10 +826,10 @@ async function signup(event) {
         users.push(user);
         setUsers(users);
         setCurrentUser(user);
-        alert('Signup successful! Please complete your profile.');
+        showStatus('signupStatus', 'Signup successful! Please complete your profile.', false);
         showSection('profile');
     } catch (error) {
-        alert(error.message);
+        showStatus('signupStatus', error.message, true);
     }
 }
 
@@ -815,7 +854,7 @@ async function login(event) {
         setCurrentUser(user);
         showSection('profile');
     } catch (error) {
-        alert(error.message);
+        showStatus('loginStatus', error.message, true);
     }
 }
 
@@ -1152,7 +1191,7 @@ function setNotifications(notifs) {
                 setCurrentUser(user);
                 showProfile();
             } catch (error) {
-                alert(error.message);
+                showStatus('loginStatus', error.message, true);
             }
         }
 
@@ -1770,14 +1809,14 @@ async function postJob(event) {
         });
         jobs.unshift(saved);
         localStorage.setItem('jobs', JSON.stringify(jobs));
-        alert('Job posted successfully! It will appear in the job listings.');
+        showStatus('postJobStatus', 'Job posted successfully! It will appear in the job listings.', false);
         event.target.reset();
         showSection('jobs');
         addNotification(`New job posted: ${saved.title}`);
     } catch (error) {
         jobs.unshift(newJob);
         localStorage.setItem('jobs', JSON.stringify(jobs));
-        alert('Job posted locally. Server save failed: ' + error.message);
+        showStatus('postJobStatus', 'Job posted locally. Server save failed: ' + error.message, true);
         event.target.reset();
         showSection('jobs');
         addNotification(`New job posted: ${newJob.title}`);
@@ -1906,7 +1945,7 @@ async function login(event) {
         updateNavVisibility();
         document.dispatchEvent(new Event('DOMContentLoaded')); 
     } catch (error) {
-        alert(error.message);
+        showStatus('loginStatus', error.message, true);
     }
 }
 

@@ -116,7 +116,7 @@ app.post('/login', async (req, res) => {
     );
     const user = rows[0];
     if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password.' });
+      return res.status(401).json({ message: 'Invalid username or password.' });
     }
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
     if (isPasswordValid) {
@@ -125,7 +125,7 @@ app.post('/login', async (req, res) => {
         user: { email: user.email, isAdmin: user.is_admin === true }
       });
     } else {
-      res.status(401).json({ message: 'Invalid email or password.' });
+      res.status(401).json({ message: 'Invalid username or password.' });
     }
   } catch (error) {
     console.error('Login error:', error);
