@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Brexbin Group Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f0f4f8 0%, #c9e7ff 100%);
+        }
+        .brexbin-gradient {
+            background: linear-gradient(90deg, #2563eb 0%, #38bdf8 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <header class="brexbin-gradient py-6 shadow-lg">
+        <h1 class="text-3xl font-extrabold text-white text-center tracking-wide">Brexbin Group Chat</h1>
+        <p class="text-blue-100 text-center mt-1 text-sm">All registered users are automatically in this group</p>
+    </header>
+    
+    <main class="flex-1 flex flex-col items-center justify-center px-2 py-4">
+        <div class="w-full max-w-2xl flex flex-col flex-1 h-[70vh] bg-white/90 rounded-xl shadow-2xl border border-blue-100">
+            <div id="chatBox" class="flex-1 overflow-y-auto p-6 space-y-3"></div>
+            <form id="chatForm" class="flex gap-2 p-4 border-t border-blue-100 bg-white rounded-b-xl">
+                <div class="flex flex-col flex-1">
+                    <div id="emojiPicker" class="mb-2 flex flex-wrap gap-1"></div>
+                    <input type="text" id="chatInput" autocomplete="off" class="flex-1 border border-blue-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800" placeholder="Type your message..." required>
+                </div>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold shadow transition">Send</button>
+            </form>
+        </div>
+        <div class="mt-6 text-center">
+            <a href="sudents.html" class="text-blue-700 hover:underline font-semibold">← Back to Brexbin</a>
+        </div>
+    </main>
+    <script>
+    
+    function getCurrentUser() {
+        return JSON.parse(localStorage.getItem('currentUser') || 'null');
+    }
+    function getUsers() {
+        return JSON.parse(localStorage.getItem('users') || '[]');
+    }
+    function getMessages() {
+        return JSON.parse(localStorage.getItem('groupMessages') || '[]');
+    }
+    function setMessages(msgs) {
+        localStorage.setItem('groupMessages', JSON.stringify(msgs));
+    }
+    function isAdmin() {
+        const user = getCurrentUser();
+        return user && (user.email === "admin@brexbin.com" || user.isAdmin === true);
+    }
+
+    
+    const emojis = ["😀","😂","😍","😎","👍","🙏","🎉","🔥","😢","😡","❤️","👏"];
+    function renderEmojiPicker() {
+        const picker = document.getElementById('emojiPicker');
+        picker.innerHTML = emojis.map(e => `<button type="button" class="text-2xl" onclick="insertEmoji('${e}')">${e}</button>`).join(' ');
+    }
+    function insertEmoji(emoji) {
+        const input = document.getElementById('chatInput');
+        input.value += emoji;
+        input.focus();
+    }
+
+    
+    function markMessagesRead() {
+        const user = getCurrentUser();
+        if (!user) return;
+        let messages = getMessages();
+        let changed = false;
+        messages = messages.map(msg => {
+            if (!msg.readBy) msg.readBy = [];
+            if (!msg.readBy.includes(user.email)) {
+                msg.readBy.push(user.email);
+                changed = true;
+            }
+            return msg;
+        });
+        if (changed) setMessages(messages);
+    }
+
+   
+    function renderChat() {
+        const chatBox = document.getElementById('chatBox');
+        const messages = getMessages();
+        const user = getCurrentUser();
+        chatBox.innerHTML = messages.map((msg, idx) => {
+            const isMine = user && msg.email === user.email;
+            const canDelete = isMine || isAdmin();
+            const canEdit = isMine;
+            const readCount = msg.readBy ? msg.readBy.length : 0;
+            const totalUsers = getUsers().length;
+            return `
+                <div class="flex ${isMine ? 'justify-end' : 'justify-start'} group relative">
+                    <div class="max-w-[70%] px-4 py-2 rounded-lg shadow
+                        ${isMine 
+                            ? 'bg-blue-600 text-white rounded-br-none' 
+                            : 'bg-blue-100 text-blue-900 rounded-bl-none'}">
+                        <div class="text-xs font-semibold mb-1">${msg.name || msg.email}
+                            <span class="text-[10px] text-blue-200 ml-2">${new Date(msg.time).toLocaleTimeString()}</span>
+                        </div>
+                        <div class="break-words">${msg.text}</div>
+                        <div class="flex gap-2 mt-1">
+                            ${canEdit ? `<button class="text-xs text-yellow-600 hover:underline" onclick="editMessage(${idx})">Edit</button>` : ""}
+                            ${canDelete ? `<button class="text-xs text-red-600 hover:underline" onclick="deleteMessage(${idx})">Delete</button>` : ""}
+                        </div>
+                        <div class="text-[10px] text-gray-400 mt-1">
+                            ${readCount === totalUsers ? "Seen by all" : readCount > 1 ? `Seen by ${readCount}` : ""}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        chatBox.scrollTop = chatBox.scrollHeight;
+        markMessagesRead();
+    }
+
+    // --- Edit Message ---
+    function editMessage(idx) {
+        const messages = getMessages();
+        const user = getCurrentUser();
+        if (!user || messages[idx].email !== user.email) return;
+        const newText = prompt("Edit your message:", messages[idx].text);
+        if (newText !== null && newText.trim() !== "") {
+            messages[idx].text = newText.trim();
+            setMessages(messages);
+            renderChat();
+        }
+    }
+
+    // --- Delete Message ---
+    function deleteMessage(idx) {
+        const messages = getMessages();
+        const user = getCurrentUser();
+        if (!user) return;
+        if (messages[idx].email === user.email || isAdmin()) {
+            messages.splice(idx, 1);
+            setMessages(messages);
+            renderChat();
+        }
+    }
+
+    // --- Notify All Users Except Sender ---
+    function notifyAllUsersOfGroupMessage(sender, text) {
+        let users = getUsers();
+        users.forEach(u => {
+            if (u.email !== sender.email) {
+                let notifs = JSON.parse(localStorage.getItem('notifications_' + u.email) || '[]');
+                notifs.unshift({
+                    id: Date.now(),
+                    message: `New group chat message from ${sender.name || sender.email}: "${text}"`,
+                    time: new Date().toLocaleString(),
+                    read: false
+                });
+                localStorage.setItem('notifications_' + u.email, JSON.stringify(notifs));
+            }
+        });
+    }
+
+    
+    document.getElementById('chatForm').onsubmit = function(e) {
+        e.preventDefault();
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if (!text) return;
+        const user = getCurrentUser();
+        if (!user) {
+            alert("You must be logged in to chat.");
+            return;
+        }
+        const msg = {
+            email: user.email,
+            name: user.name || user.email,
+            text,
+            time: Date.now(),
+            readBy: [user.email]
+        };
+        const messages = getMessages();
+        messages.push(msg);
+        setMessages(messages);
+        notifyAllUsersOfGroupMessage(user, text);
+        input.value = '';
+        renderChat();
+    };
+
+    
+    document.addEventListener('DOMContentLoaded', renderEmojiPicker);
+
+    setInterval(renderChat, 2000);
+    renderChat();
+    </script>
+</body>
+</html>
