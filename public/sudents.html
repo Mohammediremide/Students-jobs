@@ -69,7 +69,8 @@
                 <button onclick="toggleNotifications(); toggleMobileMenu(false)" class="w-full text-left text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Notifications</button>
             </div>
         </div>
-    </nav>
+</nav>
+    <div id="globalStatus" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-3 text-center text-sm"></div>
 <div id="adminDashboard" class="section hidden">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <h2 class="text-3xl font-bold text-primary mb-6">Admin Dashboard</h2>
@@ -742,6 +743,36 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 
+<!-- CONFIRM MODAL -->
+<div id="confirmModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Please Confirm</h3>
+        <p id="confirmMessage" class="text-gray-700 mb-4"></p>
+        <div class="flex gap-3">
+            <button id="confirmYesBtn" type="button" class="flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary">Yes</button>
+            <button id="confirmNoBtn" type="button" class="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT JOB MODAL -->
+<div id="editJobModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Edit Job</h3>
+        <div class="space-y-3">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Job Title</label>
+                <input type="text" id="editJobTitle" class="w-full border border-gray-300 rounded-md px-3 py-2">
+            </div>
+        </div>
+        <div class="mt-6 flex gap-3">
+            <button id="editJobSaveBtn" type="button" class="flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary">Save</button>
+            <button id="editJobCancelBtn" type="button" class="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300">Cancel</button>
+        </div>
+        <div id="editJobStatus" class="mt-4 text-center text-sm"></div>
+    </div>
+</div>
+
 <script>
 // --- Helper Functions ---
 function getUsers() {
@@ -780,11 +811,16 @@ async function apiRequest(path, options = {}) {
     return data;
 }
 function showStatus(elementId, message, isError) {
-    const el = document.getElementById(elementId);
+    const targetId = elementId || 'globalStatus';
+    const el = document.getElementById(targetId);
     if (!el) return;
     if (el._timerId) clearTimeout(el._timerId);
     el.textContent = message;
-    el.className = `mt-4 text-center text-sm ${isError ? 'text-red-500' : 'text-green-600'}`;
+    if (targetId === 'globalStatus') {
+        el.className = `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-3 text-center text-sm ${isError ? 'text-red-500' : 'text-green-600'}`;
+    } else {
+        el.className = `mt-4 text-center text-sm ${isError ? 'text-red-500' : 'text-green-600'}`;
+    }
     el._timerId = setTimeout(() => {
         el.textContent = '';
     }, 10000);
@@ -799,6 +835,83 @@ function toggleMobileMenu(forceState) {
         menu.classList.add('hidden');
     }
 }
+let confirmCallback = null;
+function openConfirm(message, onConfirm) {
+    const modal = document.getElementById('confirmModal');
+    const msg = document.getElementById('confirmMessage');
+    if (!modal || !msg) return;
+    confirmCallback = onConfirm;
+    msg.textContent = message;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+function closeConfirm() {
+    const modal = document.getElementById('confirmModal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    confirmCallback = null;
+}
+
+let editingJobId = null;
+function openEditJobModal(jobId) {
+    const modal = document.getElementById('editJobModal');
+    const input = document.getElementById('editJobTitle');
+    if (!modal || !input) return;
+    const job = jobs.find(j => j.id === jobId);
+    if (!job) return;
+    editingJobId = jobId;
+    input.value = job.title || '';
+    showStatus('editJobStatus', '', false);
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+function closeEditJobModal() {
+    const modal = document.getElementById('editJobModal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    editingJobId = null;
+}
+function saveEditJob() {
+    const input = document.getElementById('editJobTitle');
+    if (!input) return;
+    const newTitle = input.value.trim();
+    if (!newTitle) {
+        showStatus('editJobStatus', 'Job title cannot be empty.', true);
+        return;
+    }
+    const job = jobs.find(j => j.id === editingJobId);
+    if (!job) {
+        showStatus('editJobStatus', 'Job not found.', true);
+        return;
+    }
+    job.title = newTitle;
+    localStorage.setItem('jobs', JSON.stringify(jobs));
+    renderAdminDashboard();
+    addNotification(`Job "${job.title}" was edited by admin.`);
+    showStatus('editJobStatus', 'Job updated successfully.', false);
+    setTimeout(closeEditJobModal, 800);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const yesBtn = document.getElementById('confirmYesBtn');
+    const noBtn = document.getElementById('confirmNoBtn');
+    if (yesBtn) {
+        yesBtn.onclick = function () {
+            if (typeof confirmCallback === 'function') confirmCallback();
+            closeConfirm();
+        };
+    }
+    if (noBtn) {
+        noBtn.onclick = closeConfirm;
+    }
+
+    const editSaveBtn = document.getElementById('editJobSaveBtn');
+    const editCancelBtn = document.getElementById('editJobCancelBtn');
+    if (editSaveBtn) editSaveBtn.onclick = saveEditJob;
+    if (editCancelBtn) editCancelBtn.onclick = closeEditJobModal;
+});
 function showSection(section) {
     document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
     document.getElementById(section).classList.remove('hidden');
@@ -1761,7 +1874,7 @@ async function loadJobs() {
     const hours = document.getElementById('availableHours').value.trim();
     const why = document.getElementById('whyInterested').value.trim();
     if (!name || !email || !phone || !school || !hours || !why) {
-        alert('Please fill in all fields.');
+        showStatus(null, 'Please fill in all fields.', true);
         return;
     }
     const job = jobs.find(j => j.id === currentJobId);
@@ -1771,10 +1884,10 @@ async function loadJobs() {
         const rejected = Math.random() < 0.5;
         if (rejected) {
             addNotification(`Your application for ${jobTitle} was rejected.`);
-            alert('Sorry, your application was not successful this time.');
+            showStatus(null, 'Sorry, your application was not successful this time.', true);
         } else {
             addNotification(`Congratulations! Your application for ${jobTitle} was accepted.`);
-            alert('Your application was submitted successfully!');
+            showStatus(null, 'Your application was submitted successfully!', false);
         }
     }, 10000);
     closeModal();
@@ -1882,22 +1995,26 @@ function deleteUserAsAdmin(userIdx) {
     const user = users[userIdx];
     if (!user) return;
     if (user.isAdmin) {
-        alert("You cannot delete an admin user.");
+        showStatus(null, 'You cannot delete an admin user.', true);
         return;
     }
-    if (!confirm(`Are you sure you want to delete user: ${user.email}?`)) return;
-    users.splice(userIdx, 1);
-    setUsers(users);
-    renderAdminDashboard();
-    addNotification(`User ${user.email} deleted by admin.`);
+    openConfirm(`Are you sure you want to delete user: ${user.email}?`, () => {
+        users.splice(userIdx, 1);
+        setUsers(users);
+        renderAdminDashboard();
+        addNotification(`User ${user.email} deleted by admin.`);
+        showStatus(null, `User ${user.email} deleted.`, false);
+    });
 }
 
 function deleteJobAsAdmin(jobId) {
-    if (!confirm("Are you sure you want to delete this job?")) return;
-    jobs = jobs.filter(j => j.id !== jobId);
-    localStorage.setItem('jobs', JSON.stringify(jobs));
-    renderAdminDashboard();
-    addNotification("Job deleted by admin.");
+    openConfirm('Are you sure you want to delete this job?', () => {
+        jobs = jobs.filter(j => j.id !== jobId);
+        localStorage.setItem('jobs', JSON.stringify(jobs));
+        renderAdminDashboard();
+        addNotification('Job deleted by admin.');
+        showStatus(null, 'Job deleted.', false);
+    });
 }
 
 function updateNavVisibility() {
@@ -2281,14 +2398,7 @@ notifList.innerHTML = allNotifs.length ? allNotifs.map(n => `
 
 
 function editJobAsAdmin(jobId) {
-    const job = jobs.find(j => j.id === jobId);
-    if (!job) return;
-    const newTitle = prompt("Edit job title:", job.title);
-    if (newTitle === null) return;
-    job.title = newTitle.trim() || job.title;
-    localStorage.setItem('jobs', JSON.stringify(jobs));
-    renderAdminDashboard();
-    addNotification(`Job "${job.title}" was edited by admin.`);
+    openEditJobModal(jobId);
 }
 function deleteNotificationForUser(userEmail, notifTime) {
     let notifs = JSON.parse(localStorage.getItem('notifications_' + userEmail) || '[]');

@@ -39,8 +39,8 @@
             </div>
             <input type="submit" value="Pay $9 for Premium" class="w-full bg-blue-600 text-white font-semibold py-2 rounded hover:bg-blue-700 transition">
         </form>
-        <!-- Success message -->
-        <div id="message" class="mt-4 text-center text-green-600 font-semibold hidden"></div>
+        <!-- Status message -->
+        <div id="message" class="mt-4 text-center text-sm hidden"></div>
         <p class="mt-6 text-center">
             <a href="sudents.html" class="text-blue-600 hover:underline">Back to Home</a>
         </p>
@@ -49,11 +49,24 @@
         &copy; 2025 Payment Portal
     </footer>
     <script>
+        function showPaymentStatus(message, isError) {
+            const el = document.getElementById('message');
+            if (!el) return;
+            if (el._timerId) clearTimeout(el._timerId);
+            el.textContent = message;
+            el.className = `mt-4 text-center text-sm ${isError ? 'text-red-500' : 'text-green-600'}`;
+            el.classList.remove('hidden');
+            el._timerId = setTimeout(() => {
+                el.textContent = '';
+                el.classList.add('hidden');
+            }, 10000);
+        }
+
         document.getElementById('paymentForm').addEventListener('submit', function(e) {
             e.preventDefault();
             let email = document.getElementById('paystack_email').value.trim();
             if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-                alert("Please enter a valid email.");
+                showPaymentStatus('Please enter a valid email.', true);
                 return;
             }
             let handler = PaystackPop.setup({
@@ -63,12 +76,11 @@
                 currency : "NGN",
                 ref: ''+Math.floor((Math.random() * 1000000000) + 1),
                 callback: function(response){
-                    document.getElementById('message').textContent = 'Payment successful! Reference: ' + response.reference;
-                    document.getElementById('message').classList.remove('hidden');
+                    showPaymentStatus('Payment successful! Reference: ' + response.reference, false);
                     document.getElementById('paymentForm').reset();
                 },
                 onClose: function(){
-                    alert('Payment window closed.');
+                    showPaymentStatus('Payment window closed.', true);
                 }
             });
             handler.openIframe();
