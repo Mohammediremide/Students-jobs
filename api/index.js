@@ -265,7 +265,7 @@ app.get('/jobs', (req, res) => {
       await seedJobsIfEmpty();
       const { rows } = await pool.query(
         `SELECT id, title, company, category, pay, location, country,
-                description, requirements, contact, posted, apply_url, source_name, source_url
+                description, requirements, contact, posted, apply_url, source_name, source_url, created_at
          FROM jobs
          ORDER BY id DESC`
       );
@@ -275,12 +275,13 @@ app.get('/jobs', (req, res) => {
         company: r.company,
         category: r.category,
         pay: r.pay,
+        salaryLabel: r.requirements && r.requirements.includes('Salary:') ? r.requirements.split('Salary:')[1].split('|')[0].trim() : '',
         location: r.location,
         country: r.country,
         description: r.description,
         requirements: r.requirements,
         contact: r.contact,
-        posted: r.posted,
+        posted: r.posted || (r.created_at ? new Date(r.created_at).toISOString() : ''),
         applyUrl: r.apply_url,
         sourceName: r.source_name,
         sourceUrl: r.source_url

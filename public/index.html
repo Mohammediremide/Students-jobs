@@ -1800,7 +1800,9 @@ async function loadJobs() {
     container.innerHTML = '';
 
     jobsToShow.forEach(job => {
-        const payLabel = job.pay && job.pay > 0 ? `$${job.pay}/hr` : 'Pay not listed';
+        const payLabel = job.pay && job.pay > 0
+            ? `$${job.pay}/hr`
+            : (job.salaryLabel ? job.salaryLabel : 'Pay not listed');
         const jobCard = document.createElement('div');
         jobCard.className = 'bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow';
         jobCard.innerHTML = `
@@ -2461,8 +2463,9 @@ function saveWalletPin() {
 
        
         function getPostedLabel(dateString) {
+    if (!dateString) return 'Posted recently';
     const postedDate = new Date(dateString);
-    
+    if (isNaN(postedDate.getTime())) return 'Posted recently';
     return postedDate.toLocaleString(undefined, { 
         weekday: 'long', year: 'numeric', month: 'short', day: 'numeric',
         hour: '2-digit', minute: '2-digit'
