@@ -998,21 +998,21 @@ function closeResetPasswordModal() {
 function resetPassword(event) {
     event.preventDefault();
     const email = document.getElementById('resetEmail').value.trim();
-    const users = getUsers();
     const status = document.getElementById('resetPasswordStatus');
     if (!resetUser) {
-        // Step 1: Find user and show security question
-        const user = users.find(u => u.email === email);
-        if (!user) {
-            status.textContent = "No account found with that email.";
+        apiRequest('/reset-password/start', {
+            method: 'POST',
+            body: { email }
+        }).then(result => {
+            resetUser = { email };
+            document.getElementById('securityQuestionLabel').textContent = result.securityQuestion || 'Security Question';
+            document.getElementById('securityQuestionDiv').classList.remove('hidden');
+            status.textContent = "Answer your security question to continue.";
+            status.className = "text-gray-700 mt-2";
+        }).catch(err => {
+            status.textContent = err.message || "No account found with that email.";
             status.className = "text-red-500 mt-2";
-            return;
-        }
-        resetUser = user;
-        document.getElementById('securityQuestionLabel').textContent = user.securityQuestion;
-        document.getElementById('securityQuestionDiv').classList.remove('hidden');
-        status.textContent = "Answer your security question to continue.";
-        status.className = "text-gray-700 mt-2";
+        });
         return;
     }
     if (resetUser && !document.getElementById('newPasswordDiv').classList.contains('hidden')) {
@@ -1023,25 +1023,33 @@ function resetPassword(event) {
             status.className = "text-red-500 mt-2";
             return;
         }
-        resetUser.password = newPass;
-        let users = getUsers();
-        users = users.map(u => u.email === resetUser.email ? resetUser : u);
-        setUsers(users);
-        status.textContent = "Password reset successful! You can now log in.";
-        status.className = "text-green-600 mt-2";
-        setTimeout(() => {
-            closeResetPasswordModal();
-            resetUser = null;
-        }, 1500);
+        apiRequest('/reset-password/complete', {
+            method: 'POST',
+            body: {
+                email: resetUser.email,
+                securityAnswer: document.getElementById('resetSecurityAnswer').value.trim(),
+                newPassword: newPass
+            }
+        }).then(() => {
+            status.textContent = "Password reset successful! You can now log in.";
+            status.className = "text-green-600 mt-2";
+            setTimeout(() => {
+                closeResetPasswordModal();
+                resetUser = null;
+            }, 1500);
+        }).catch(err => {
+            status.textContent = err.message || "Reset failed.";
+            status.className = "text-red-500 mt-2";
+        });
         return;
     }
     // Step 2: Check security answer
-    const answer = document.getElementById('resetSecurityAnswer').value.trim().toLowerCase();
-if (answer !== (resetUser.securityAnswer || '').toLowerCase()) {
-    status.textContent = "Incorrect answer. Try again.";
-    status.className = "text-red-500 mt-2";
-    return;
-}
+    const answer = document.getElementById('resetSecurityAnswer').value.trim();
+    if (!answer) {
+        status.textContent = "Please enter your answer.";
+        status.className = "text-red-500 mt-2";
+        return;
+    }
     document.getElementById('newPasswordDiv').classList.remove('hidden');
     status.textContent = "Enter your new password.";
     status.className = "text-gray-700 mt-2";
@@ -1792,6 +1800,7 @@ async function loadJobs() {
     container.innerHTML = '';
 
     jobsToShow.forEach(job => {
+        const payLabel = job.pay && job.pay > 0 ? `$${job.pay}/hr` : 'Pay not listed';
         const jobCard = document.createElement('div');
         jobCard.className = 'bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow';
         jobCard.innerHTML = `
@@ -1801,13 +1810,18 @@ async function loadJobs() {
                     <p class="text-gray-600">${job.company}</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-2xl font-bold text-primary">$${job.pay}/hr</p>
+                    <p class="text-2xl font-bold text-primary">${payLabel}</p>
                     <p class="text-sm text-gray-500">${getPostedLabel(job.posted)}</p>
                 </div>
             </div>
             <div class="mb-4">
                 <p class="text-gray-700 mb-2">${job.description}</p>
                 <p class="text-sm text-gray-600"><strong>Requirements:</strong> ${job.requirements}</p>
+                ${job.sourceName ? `
+                    <p class="text-xs text-gray-500 mt-2">Source: 
+                        <a href="${job.sourceUrl || '#'}" target="_blank" rel="noopener" class="text-primary hover:underline">${job.sourceName}</a>
+                    </p>
+                ` : ''}
             </div>
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-4">
@@ -1846,6 +1860,7 @@ async function loadJobs() {
                 let matchesPay = true;
 
                 if (payFilter) {
+                    if (!job.pay || job.pay <= 0) return false;
                     if (payFilter === '10-15') {
                         matchesPay = job.pay >= 10 && job.pay <= 15;
                     } else if (payFilter === '15-20') {
