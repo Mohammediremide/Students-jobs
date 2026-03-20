@@ -687,14 +687,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
                     <input type="password" id="signupPassword" required class="w-full border border-gray-300 rounded-md px-3 py-2">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Security Question</label>
-                    <input type="text" id="signupSecurityQuestion" required class="w-full border border-gray-300 rounded-md px-3 py-2" placeholder="e.g. Your favorite color?">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Security Answer</label>
-                    <input type="text" id="signupSecurityAnswer" required class="w-full border border-gray-300 rounded-md px-3 py-2" placeholder="Answer">
-                </div>
                 <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-md hover:bg-secondary font-medium">Sign Up</button>
             </form>
             <div id="signupStatus" class="mt-4 text-center text-sm"></div>
@@ -736,9 +728,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                     <input type="email" id="resetEmail" required class="w-full border border-gray-300 rounded-md px-3 py-2">
                 </div>
-                <div id="securityQuestionDiv" class="hidden">
-                    <label class="block text-sm font-medium text-gray-700 mb-2" id="securityQuestionLabel"></label>
-                    <input type="text" id="resetSecurityAnswer" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                <div id="verificationCodeDiv" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Verification Code</label>
+                    <input type="text" id="resetVerificationCode" class="w-full border border-gray-300 rounded-md px-3 py-2" placeholder="Enter the code sent to your email">
                 </div>
                 <div id="newPasswordDiv" class="hidden">
                     <label class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
@@ -951,8 +943,6 @@ async function signup(event) {
     event.preventDefault();
     const email = document.getElementById('signupEmail').value.trim();
     const password = document.getElementById('signupPassword').value;
-    const securityQuestion = document.getElementById('signupSecurityQuestion').value.trim();
-    const securityAnswer = document.getElementById('signupSecurityAnswer').value.trim().toLowerCase();
     let users = getUsers();
     if (users.find(u => u.email === email)) {
         showStatus('signupStatus', 'Email already registered.', true);
@@ -961,9 +951,9 @@ async function signup(event) {
     try {
         await apiRequest('/register', {
             method: 'POST',
-            body: { email, password, securityQuestion, securityAnswer }
+            body: { email, password }
         });
-        const user = { email, password, name: '', bio: '', likes: [], securityQuestion, securityAnswer };
+        const user = { email, password, name: '', bio: '', likes: [] };
         if (email === "admin@brexbin.com") user.isAdmin = true;
         users.push(user);
         setUsers(users);
@@ -1006,7 +996,8 @@ function openResetPasswordModal() {
     document.getElementById('resetPasswordModal').classList.remove('hidden');
     document.getElementById('resetPasswordModal').classList.add('flex');
     document.getElementById('resetEmail').value = '';
-    document.getElementById('securityQuestionDiv').classList.add('hidden');
+    document.getElementById('resetVerificationCode').value = '';
+    document.getElementById('verificationCodeDiv').classList.add('hidden');
     document.getElementById('newPasswordDiv').classList.add('hidden');
     document.getElementById('resetPasswordStatus').textContent = '';
     resetUser = null;
@@ -1026,9 +1017,8 @@ function resetPassword(event) {
             body: { email }
         }).then(result => {
             resetUser = { email };
-            document.getElementById('securityQuestionLabel').textContent = result.securityQuestion || 'Security Question';
-            document.getElementById('securityQuestionDiv').classList.remove('hidden');
-            status.textContent = "Answer your security question to continue.";
+            document.getElementById('verificationCodeDiv').classList.remove('hidden');
+            status.textContent = result.message || "Enter the verification code sent to your email.";
             status.className = "text-gray-700 mt-2";
         }).catch(err => {
             status.textContent = err.message || "No account found with that email.";
@@ -1048,7 +1038,7 @@ function resetPassword(event) {
             method: 'POST',
             body: {
                 email: resetUser.email,
-                securityAnswer: document.getElementById('resetSecurityAnswer').value.trim(),
+                verificationCode: document.getElementById('resetVerificationCode').value.trim(),
                 newPassword: newPass
             }
         }).then(() => {
@@ -1064,10 +1054,10 @@ function resetPassword(event) {
         });
         return;
     }
-    // Step 2: Check security answer
-    const answer = document.getElementById('resetSecurityAnswer').value.trim();
-    if (!answer) {
-        status.textContent = "Please enter your answer.";
+    // Step 2: Confirm verification code entry
+    const code = document.getElementById('resetVerificationCode').value.trim();
+    if (!code) {
+        status.textContent = "Please enter the verification code.";
         status.className = "text-red-500 mt-2";
         return;
     }
