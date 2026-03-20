@@ -405,9 +405,20 @@ document.addEventListener('DOMContentLoaded', function() {
     </select>
     <select id="categoryFilter" class="border border-gray-300 rounded-md px-3 py-2">
         <option value="">All Categories</option>
-       
-        <option value="remote">Remote Work</option>
-        
+        <option value="full-stack">Full Stack</option>
+        <option value="backend">Backend</option>
+        <option value="frontend">Frontend</option>
+        <option value="mobile">Mobile</option>
+        <option value="data">Data</option>
+        <option value="devops">DevOps</option>
+        <option value="security">Security</option>
+        <option value="qa">QA</option>
+        <option value="design">Design</option>
+        <option value="product">Product</option>
+        <option value="marketing">Marketing</option>
+        <option value="sales">Sales</option>
+        <option value="support">Support</option>
+        <option value="other">Other</option>
     </select>
     <select id="payFilter" class="border border-gray-300 rounded-md px-3 py-2">
         <option value="">All Pay Ranges</option>
@@ -832,6 +843,16 @@ function showStatus(elementId, message, isError) {
     el._timerId = setTimeout(() => {
         el.textContent = '';
     }, 10000);
+}
+function formatCategoryLabel(category) {
+    if (!category) return 'Other';
+    return category
+        .toString()
+        .replace(/[_-]+/g, ' ')
+        .split(' ')
+        .filter(Boolean)
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
 }
 function toggleMobileMenu(forceState) {
     const menu = document.getElementById('mobileMenu');
@@ -1828,7 +1849,7 @@ async function loadJobs() {
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-4">
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary text-white">
-                        ${job.category.charAt(0).toUpperCase() + job.category.slice(1)}
+                        ${formatCategoryLabel(job.category)}
                     </span>
                     <span class="text-sm text-gray-500">
                         <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

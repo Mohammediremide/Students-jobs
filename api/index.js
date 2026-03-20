@@ -74,6 +74,28 @@ async function fetchHimalayasJobs(maxJobs) {
   return all.slice(0, maxJobs);
 }
 
+function normalizeCategory(job) {
+  const parts = [];
+  if (job.title) parts.push(job.title);
+  if (Array.isArray(job.categories)) parts.push(job.categories.join(' '));
+  if (Array.isArray(job.parentCategories)) parts.push(job.parentCategories.join(' '));
+  const text = parts.join(' ').toLowerCase();
+  if (text.includes('full stack') || text.includes('full-stack')) return 'full-stack';
+  if (text.includes('backend') || text.includes('back-end')) return 'backend';
+  if (text.includes('frontend') || text.includes('front-end')) return 'frontend';
+  if (text.includes('mobile') || text.includes('ios') || text.includes('android') || text.includes('react native') || text.includes('flutter')) return 'mobile';
+  if (text.includes('data') || text.includes('analytics') || text.includes('machine learning') || text.includes('ml ') || text.includes(' ai ')) return 'data';
+  if (text.includes('devops') || text.includes('sre') || text.includes('infra') || text.includes('platform') || text.includes('cloud')) return 'devops';
+  if (text.includes('security') || text.includes('cyber')) return 'security';
+  if (text.includes('qa') || text.includes('test') || text.includes('quality')) return 'qa';
+  if (text.includes('design') || text.includes('ux') || text.includes('ui')) return 'design';
+  if (text.includes('product') || text.includes('pm ')) return 'product';
+  if (text.includes('marketing') || text.includes('growth')) return 'marketing';
+  if (text.includes('sales') || text.includes('business development')) return 'sales';
+  if (text.includes('support') || text.includes('customer success')) return 'support';
+  return 'other';
+}
+
 async function seedJobsIfEmpty() {
   const { rows } = await pool.query('SELECT COUNT(*)::int AS count FROM jobs');
   if (rows[0].count > 0) return;
@@ -108,7 +130,7 @@ async function seedJobsIfEmpty() {
     await pool.query(insertText, [
       job.title || 'Remote role',
       job.companyName || 'Unknown',
-      (Array.isArray(job.parentCategories) && job.parentCategories[0]) || (Array.isArray(job.categories) && job.categories[0]) || 'remote',
+      normalizeCategory(job),
       0,
       'Remote',
       country,
