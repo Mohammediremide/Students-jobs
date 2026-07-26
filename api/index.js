@@ -2,7 +2,6 @@
 
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
 const cors = require('cors');
 const { Pool } = require('pg');
 
@@ -11,51 +10,114 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
-
-const BREVO_API_KEY = process.env.BREVO_API_KEY;
-const BREVO_SENDER_EMAIL = process.env.BREVO_SENDER_EMAIL || 'no-reply@example.com';
-const BREVO_SENDER_NAME = process.env.BREVO_SENDER_NAME || 'Students Jobs';
-const RESET_CODE_TTL_MINUTES = parseInt(process.env.RESET_CODE_TTL_MINUTES || '10', 10);
-const RESET_CODE_COOLDOWN_SECONDS = parseInt(process.env.RESET_CODE_COOLDOWN_SECONDS || '60', 10);
-const RESET_CODE_MAX_PER_HOUR = parseInt(process.env.RESET_CODE_MAX_PER_HOUR || '5', 10);
-
-function generateVerificationCode() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
-
-function hashVerificationCode(code) {
-  return crypto.createHash('sha256').update(code).digest('hex');
-}
-
-async function sendVerificationEmail(email, code) {
-  if (!BREVO_API_KEY) {
-    throw new Error('BREVO_API_KEY is not set.');
-  }
-  const payload = {
-    sender: { name: BREVO_SENDER_NAME, email: BREVO_SENDER_EMAIL },
-    to: [{ email }],
-    subject: 'Your password reset verification code',
-    htmlContent: `<p>Your verification code is <strong>${code}</strong>.</p><p>This code expires in ${RESET_CODE_TTL_MINUTES} minutes.</p>`,
-    textContent: `Your verification code is ${code}. It expires in ${RESET_CODE_TTL_MINUTES} minutes.`
-  };
-  const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-    method: 'POST',
-    headers: {
-      'accept': 'application/json',
-      'content-type': 'application/json',
-      'api-key': BREVO_API_KEY
-    },
-    body: JSON.stringify(payload)
+let pgPool;
+if (process.env.DATABASE_URL) {
+  pgPool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
   });
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '');
-    throw new Error(`Brevo email send failed. ${detail}`.trim());
-  }
+} else {
+  console.warn("WARNING: DATABASE_URL not set. Using temporary in-memory database fallback.");
 }
+
+// In-memory mock tables
+let mockUsers = [
+  {
+    id: 1,
+    email: 'admin@brexbin.com',
+    password_hash: '$2a$10$U5R5Gj01l8zXp5N6W8p1OeR1D9yH9E5K6m2rO.d3a6o4c8z2c5c3y', // password is 'admin'
+    security_question: 'Admin pin',
+    security_answer: '1234',
+    is_admin: true,
+    created_at: new Date().toISOString()
+  }
+];
+let mockJobs = [];
+
+const pool = {
+  query: async (text, params = []) => {
+    if (pgPool) {
+      return pgPool.query(text, params);
+    }
+    const normalized = text.trim().replace(/\s+/g, ' ').toLowerCase();
+    
+    if (normalized.startsWith('create table') || normalized.startsWith('alter table') || normalized.startsWith('create index')) {
+      return { rows: [] };
+    }
+    if (normalized.includes('select count(*)::int as count from jobs')) {
+      return { rows: [{ count: mockJobs.length }] };
+    }
+    if (normalized.includes('select id from users where email = $1')) {
+      const email = params[0];
+      return { rows: mockUsers.filter(u => u.email === email) };
+    }
+    if (normalized.includes('insert into users')) {
+      const [email, password_hash, security_question, security_answer, is_admin] = params;
+      const newUser = {
+        id: mockUsers.length + 1,
+        email,
+        password_hash,
+        security_question,
+        security_answer,
+        is_admin: !!is_admin,
+        created_at: new Date().toISOString()
+      };
+      mockUsers.push(newUser);
+      return { rows: [newUser] };
+    }
+    if (normalized.includes('select id, email, password_hash, is_admin from users where email = $1')) {
+      const email = params[0];
+      return { rows: mockUsers.filter(u => u.email === email) };
+    }
+    if (normalized.includes('select security_question from users where email = $1')) {
+      const email = params[0];
+      return { rows: mockUsers.filter(u => u.email === email).map(u => ({ security_question: u.security_question })) };
+    }
+    if (normalized.includes('select id, security_answer from users where email = $1')) {
+      const email = params[0];
+      return { rows: mockUsers.filter(u => u.email === email).map(u => ({ id: u.id, security_answer: u.security_answer })) };
+    }
+    if (normalized.includes('update users set password_hash = $1 where id = $2')) {
+      const [hash, id] = params;
+      const user = mockUsers.find(u => u.id === id);
+      if (user) user.password_hash = hash;
+      return { rows: [] };
+    }
+    if (normalized.includes('delete from jobs')) {
+      mockJobs = [];
+      return { rows: [] };
+    }
+    if (normalized.includes('insert into jobs')) {
+      if (params.length === 14) {
+        const [title, company, category, pay, location, country, description, requirements, contact, posted, apply_url, source_name, source_url, source_guid] = params;
+        if (source_guid && mockJobs.some(j => j.source_guid === source_guid)) {
+          return { rows: [] };
+        }
+        const newJob = {
+          id: mockJobs.length + 1,
+          title, company, category, pay, location, country, description, requirements, contact, posted, apply_url, source_name, source_url, source_guid,
+          created_at: new Date().toISOString()
+        };
+        mockJobs.push(newJob);
+        return { rows: [newJob] };
+      } else {
+        const [title, company, category, pay, location, country, description, requirements, contact, posted, apply_url] = params;
+        const newJob = {
+          id: mockJobs.length + 1,
+          title, company, category, pay, location, country, description, requirements, contact, posted, apply_url,
+          created_at: new Date().toISOString()
+        };
+        mockJobs.push(newJob);
+        return { rows: [newJob] };
+      }
+    }
+    if (normalized.includes('select id, title, company, category, pay, location, country')) {
+      const sorted = [...mockJobs].sort((a, b) => b.id - a.id);
+      return { rows: sorted };
+    }
+    return { rows: [] };
+  }
+};
 
 let dbReady = false;
 async function initDb() {
@@ -65,20 +127,12 @@ async function initDb() {
       id SERIAL PRIMARY KEY,
       email TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
+      security_question TEXT,
+      security_answer TEXT,
       is_admin BOOLEAN DEFAULT FALSE,
       created_at TIMESTAMPTZ DEFAULT NOW()
     );
   `);
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS password_resets (
-      id SERIAL PRIMARY KEY,
-      email TEXT NOT NULL,
-      code_hash TEXT NOT NULL,
-      expires_at TIMESTAMPTZ NOT NULL,
-      created_at TIMESTAMPTZ DEFAULT NOW()
-    );
-  `);
-  await pool.query(`CREATE INDEX IF NOT EXISTS password_resets_email_idx ON password_resets (email);`);
   await pool.query(`
     CREATE TABLE IF NOT EXISTS jobs (
       id SERIAL PRIMARY KEY,
@@ -221,7 +275,7 @@ async function seedJobsIfEmpty() {
 }
 
 app.post('/register', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, securityQuestion, securityAnswer } = req.body;
   if (!email || !password) {
     return res.status(400).json({ message: 'Email and password are required.' });
   }
@@ -235,9 +289,9 @@ app.post('/register', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, saltRounds);
     const isAdmin = email === 'admin@brexbin.com';
     await pool.query(
-      `INSERT INTO users (email, password_hash, is_admin)
-       VALUES ($1, $2, $3)`,
-      [email, passwordHash, isAdmin]
+      `INSERT INTO users (email, password_hash, security_question, security_answer, is_admin)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [email, passwordHash, securityQuestion || null, securityAnswer || null, isAdmin]
     );
     res.status(201).json({ message: 'User registered successfully!' });
   } catch (error) {
@@ -284,48 +338,14 @@ app.post('/reset-password/start', async (req, res) => {
   try {
     await initDb();
     const { rows } = await pool.query(
-      'SELECT id FROM users WHERE email = $1',
+      'SELECT security_question FROM users WHERE email = $1',
       [email]
     );
     const user = rows[0];
     if (!user) {
       return res.status(404).json({ message: 'No account found with that email.' });
     }
-    const { rows: recentRows } = await pool.query(
-      `SELECT created_at
-       FROM password_resets
-       WHERE email = $1
-       ORDER BY created_at DESC
-       LIMIT 1`,
-      [email]
-    );
-    const lastRequestAt = recentRows[0]?.created_at ? new Date(recentRows[0].created_at) : null;
-    if (lastRequestAt) {
-      const elapsedSeconds = Math.floor((Date.now() - lastRequestAt.getTime()) / 1000);
-      if (elapsedSeconds < RESET_CODE_COOLDOWN_SECONDS) {
-        const remaining = RESET_CODE_COOLDOWN_SECONDS - elapsedSeconds;
-        return res.status(429).json({ message: `Please wait ${remaining} seconds before requesting another code.` });
-      }
-    }
-    const { rows: windowRows } = await pool.query(
-      `SELECT COUNT(*)::int AS count
-       FROM password_resets
-       WHERE email = $1 AND created_at > NOW() - INTERVAL '1 hour'`,
-      [email]
-    );
-    if (windowRows[0].count >= RESET_CODE_MAX_PER_HOUR) {
-      return res.status(429).json({ message: 'Too many requests. Please try again later.' });
-    }
-    const code = generateVerificationCode();
-    const codeHash = hashVerificationCode(code);
-    const expiresAt = new Date(Date.now() + RESET_CODE_TTL_MINUTES * 60 * 1000);
-    await pool.query('DELETE FROM password_resets WHERE email = $1', [email]);
-    await pool.query(
-      'INSERT INTO password_resets (email, code_hash, expires_at) VALUES ($1, $2, $3)',
-      [email, codeHash, expiresAt]
-    );
-    await sendVerificationEmail(email, code);
-    res.status(200).json({ message: 'Verification code sent to your email.' });
+    res.status(200).json({ securityQuestion: user.security_question || '' });
   } catch (error) {
     console.error('Reset start error:', error);
     res.status(500).json({ message: 'Server error during reset.' });
@@ -333,43 +353,27 @@ app.post('/reset-password/start', async (req, res) => {
 });
 
 app.post('/reset-password/complete', async (req, res) => {
-  const { email, verificationCode, newPassword } = req.body || {};
-  if (!email || !verificationCode || !newPassword) {
-    return res.status(400).json({ message: 'Email, verification code, and new password are required.' });
+  const { email, securityAnswer, newPassword } = req.body || {};
+  if (!email || !securityAnswer || !newPassword) {
+    return res.status(400).json({ message: 'Email, answer, and new password are required.' });
   }
   try {
     await initDb();
-    const { rows: userRows } = await pool.query(
-      'SELECT id FROM users WHERE email = $1',
+    const { rows } = await pool.query(
+      'SELECT id, security_answer FROM users WHERE email = $1',
       [email]
     );
-    const user = userRows[0];
+    const user = rows[0];
     if (!user) {
       return res.status(404).json({ message: 'No account found with that email.' });
     }
-    const { rows: resetRows } = await pool.query(
-      `SELECT id, code_hash, expires_at
-       FROM password_resets
-       WHERE email = $1
-       ORDER BY created_at DESC
-       LIMIT 1`,
-      [email]
-    );
-    const reset = resetRows[0];
-    if (!reset) {
-      return res.status(400).json({ message: 'No verification code found. Request a new code.' });
-    }
-    if (new Date(reset.expires_at).getTime() < Date.now()) {
-      return res.status(401).json({ message: 'Verification code expired. Request a new code.' });
-    }
-    const providedHash = hashVerificationCode(verificationCode.trim());
-    if (providedHash !== reset.code_hash) {
-      return res.status(401).json({ message: 'Invalid verification code.' });
+    const expected = (user.security_answer || '').toLowerCase().trim();
+    if (expected && expected !== securityAnswer.toLowerCase().trim()) {
+      return res.status(401).json({ message: 'Incorrect security answer.' });
     }
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(newPassword, saltRounds);
     await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [passwordHash, user.id]);
-    await pool.query('DELETE FROM password_resets WHERE email = $1', [email]);
     res.status(200).json({ message: 'Password reset successful.' });
   } catch (error) {
     console.error('Reset complete error:', error);

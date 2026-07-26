@@ -4,44 +4,81 @@
     <meta charset="UTF-8">
     <title>Brexbin Group Chat</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Tailwind CSS CDN -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#4f46e5',
+                        accent: '#a855f7',
+                        darkBg: '#0f172a'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body {
-            background: linear-gradient(135deg, #f0f4f8 0%, #c9e7ff 100%);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
         }
-        .brexbin-gradient {
-            background: linear-gradient(90deg, #2563eb 0%, #38bdf8 100%);
+        h1, h2, h3, h4, h5, h6, .font-heading {
+            font-family: 'Outfit', sans-serif;
         }
     </style>
+    <script>
+        // PWA registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js');
+            });
+        }
+    </script>
 </head>
-<body class="min-h-screen flex flex-col">
-    <header class="brexbin-gradient py-6 shadow-lg">
-        <h1 class="text-3xl font-extrabold text-white text-center tracking-wide">Brexbin Group Chat</h1>
-        <p class="text-blue-100 text-center mt-1 text-sm">All registered users are automatically in this group</p>
-    </header>
-    
-    <main class="flex-1 flex flex-col items-center justify-center px-2 py-4">
-        <div id="chatStatus" class="mb-3 text-center text-sm"></div>
-        <div class="w-full max-w-2xl flex flex-col flex-1 h-[70vh] bg-white/90 rounded-xl shadow-2xl border border-blue-100">
-            <div id="chatBox" class="flex-1 overflow-y-auto p-6 space-y-3"></div>
-            <form id="chatForm" class="flex gap-2 p-4 border-t border-blue-100 bg-white rounded-b-xl">
-                <div class="flex flex-col flex-1">
-                    <div id="emojiPicker" class="mb-2 flex flex-wrap gap-1"></div>
-                    <input type="text" id="chatInput" autocomplete="off" class="flex-1 border border-blue-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800" placeholder="Type your message..." required>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+    <nav class="bg-slate-900/85 backdrop-blur-md border-b border-slate-800 py-4 shadow-lg z-50">
+        <div class="max-w-4xl mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <span class="text-white font-extrabold text-sm">B</span>
                 </div>
-                <div class="flex flex-col gap-2">
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold shadow transition">Send</button>
-                    <button type="button" id="cancelEditBtn" class="hidden bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg font-semibold shadow transition">Cancel Edit</button>
+                <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Group Chat</h1>
+            </div>
+            <a href="index.html" class="text-slate-300 hover:text-indigo-400 text-sm font-semibold transition-colors flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Dashboard
+            </a>
+        </div>
+    </nav>
+    
+    <main class="flex-1 flex flex-col items-center justify-center px-4 py-6">
+        <div id="chatStatus" class="mb-3 text-center text-sm font-semibold"></div>
+        <div class="w-full max-w-2xl flex flex-col flex-1 h-[70vh] bg-slate-900/50 backdrop-blur-md rounded-3xl border border-slate-800 shadow-2xl overflow-hidden">
+            <div id="chatBox" class="flex-1 overflow-y-auto p-6 space-y-4"></div>
+            
+            <form id="chatForm" class="flex flex-col gap-2 p-4 border-t border-slate-800 bg-slate-900/90 rounded-b-3xl">
+                <div id="emojiPicker" class="mb-1 flex flex-wrap gap-2.5 pb-2"></div>
+                <div class="flex gap-2">
+                    <input type="text" id="chatInput" autocomplete="off" class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="Type your message..." required>
+                    <div class="flex gap-2">
+                        <button type="submit" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold px-6 py-3 rounded-xl transition-all shadow-md">Send</button>
+                        <button type="button" id="cancelEditBtn" class="hidden bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 px-4 py-3 rounded-xl font-semibold transition-colors">Cancel</button>
+                    </div>
                 </div>
             </form>
         </div>
-        <div class="mt-6 text-center">
-            <a href="sudents.html" class="text-blue-700 hover:underline font-semibold">← Back to Brexbin</a>
-        </div>
     </main>
+
     <script>
-    
     function getCurrentUser() {
         return JSON.parse(localStorage.getItem('currentUser') || 'null');
     }
@@ -63,17 +100,16 @@
         if (!el) return;
         if (el._timerId) clearTimeout(el._timerId);
         el.textContent = message;
-        el.className = `mb-3 text-center text-sm ${isError ? 'text-red-500' : 'text-green-600'}`;
+        el.className = `mb-3 text-center text-sm ${isError ? 'text-rose-400' : 'text-emerald-400'}`;
         el._timerId = setTimeout(() => {
             el.textContent = '';
-        }, 10000);
+        }, 6000);
     }
 
-    
     const emojis = ["😀","😂","😍","😎","👍","🙏","🎉","🔥","😢","😡","❤️","👏"];
     function renderEmojiPicker() {
         const picker = document.getElementById('emojiPicker');
-        picker.innerHTML = emojis.map(e => `<button type="button" class="text-2xl" onclick="insertEmoji('${e}')">${e}</button>`).join(' ');
+        picker.innerHTML = emojis.map(e => `<button type="button" class="text-2xl hover:scale-125 transition-transform" onclick="insertEmoji('${e}')">${e}</button>`).join(' ');
     }
     function insertEmoji(emoji) {
         const input = document.getElementById('chatInput');
@@ -81,7 +117,6 @@
         input.focus();
     }
 
-    
     function markMessagesRead() {
         const user = getCurrentUser();
         if (!user) return;
@@ -98,7 +133,6 @@
         if (changed) setMessages(messages);
     }
 
-   
     function renderChat() {
         const chatBox = document.getElementById('chatBox');
         const messages = getMessages();
@@ -109,23 +143,27 @@
             const canEdit = isMine;
             const readCount = msg.readBy ? msg.readBy.length : 0;
             const totalUsers = getUsers().length;
+            
             return `
                 <div class="flex ${isMine ? 'justify-end' : 'justify-start'} group relative">
-                    <div class="max-w-[70%] px-4 py-2 rounded-lg shadow
+                    <div class="max-w-[75%] px-4.5 py-3 rounded-2xl shadow-lg border
                         ${isMine 
-                            ? 'bg-blue-600 text-white rounded-br-none' 
-                            : 'bg-blue-100 text-blue-900 rounded-bl-none'}">
-                        <div class="text-xs font-semibold mb-1">${msg.name || msg.email}
-                            <span class="text-[10px] text-blue-200 ml-2">${new Date(msg.time).toLocaleTimeString()}</span>
+                            ? 'bg-gradient-to-br from-indigo-600 to-indigo-700 text-slate-100 rounded-tr-none border-indigo-500/25' 
+                            : 'bg-slate-900/90 text-slate-200 rounded-tl-none border-slate-800'}">
+                        <div class="text-xs font-bold ${isMine ? 'text-indigo-200' : 'text-indigo-400'} mb-1.5 flex items-center gap-2">
+                            <span>${msg.name || msg.email.split('@')[0]}</span>
+                            <span class="text-[9px] text-slate-500 font-normal">${new Date(msg.time).toLocaleTimeString()}</span>
                         </div>
-                        <div class="break-words">${msg.text}</div>
-                        <div class="flex gap-2 mt-1">
-                            ${canEdit ? `<button class="text-xs text-yellow-600 hover:underline" onclick="editMessage(${idx})">Edit</button>` : ""}
-                            ${canDelete ? `<button class="text-xs text-red-600 hover:underline" onclick="deleteMessage(${idx})">Delete</button>` : ""}
+                        <div class="break-words text-sm leading-relaxed">${msg.text}</div>
+                        <div class="flex gap-3 mt-2 pt-1 border-t border-slate-800/40 text-[10px]">
+                            ${canEdit ? `<button class="text-indigo-300 hover:text-indigo-100 font-semibold" onclick="editMessage(${idx})">Edit</button>` : ""}
+                            ${canDelete ? `<button class="text-rose-400 hover:text-rose-300 font-semibold" onclick="deleteMessage(${idx})">Delete</button>` : ""}
                         </div>
-                        <div class="text-[10px] text-gray-400 mt-1">
-                            ${readCount === totalUsers ? "Seen by all" : readCount > 1 ? `Seen by ${readCount}` : ""}
-                        </div>
+                        ${readCount === totalUsers ? `
+                            <div class="text-[9px] text-slate-500 mt-1.5 text-right font-semibold">✓ Seen by all</div>
+                        ` : readCount > 1 ? `
+                            <div class="text-[9px] text-slate-500 mt-1.5 text-right">Seen by ${readCount}</div>
+                        ` : ''}
                     </div>
                 </div>
             `;
@@ -134,7 +172,6 @@
         markMessagesRead();
     }
 
-    // --- Edit Message ---
     let editingIndex = null;
     function editMessage(idx) {
         const messages = getMessages();
@@ -146,10 +183,9 @@
         input.value = messages[idx].text;
         input.focus();
         if (cancelBtn) cancelBtn.classList.remove('hidden');
-        showChatStatus('Editing message. Update and click Send.', false);
+        showChatStatus('Editing message...', false);
     }
 
-    // --- Delete Message ---
     function deleteMessage(idx) {
         const messages = getMessages();
         const user = getCurrentUser();
@@ -158,10 +194,10 @@
             messages.splice(idx, 1);
             setMessages(messages);
             renderChat();
+            showChatStatus('Message deleted.', true);
         }
     }
 
-    // --- Notify All Users Except Sender ---
     function notifyAllUsersOfGroupMessage(sender, text) {
         let users = getUsers();
         users.forEach(u => {
@@ -169,7 +205,7 @@
                 let notifs = JSON.parse(localStorage.getItem('notifications_' + u.email) || '[]');
                 notifs.unshift({
                     id: Date.now(),
-                    message: `New group chat message from ${sender.name || sender.email}: "${text}"`,
+                    message: `Group chat update from ${sender.name || sender.email.split('@')[0]}: "${text}"`,
                     time: new Date().toLocaleString(),
                     read: false
                 });
@@ -178,7 +214,6 @@
         });
     }
 
-    
     document.getElementById('chatForm').onsubmit = function(e) {
         e.preventDefault();
         const input = document.getElementById('chatInput');
@@ -222,7 +257,6 @@
         renderChat();
     };
 
-    
     document.addEventListener('DOMContentLoaded', () => {
         renderEmojiPicker();
         const cancelBtn = document.getElementById('cancelEditBtn');

@@ -6,70 +6,149 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brexbin - Find Your Perfect Part-Time Job</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#3B82F6',
-                        secondary: '#1E40AF',
+                        primary: '#6366f1',
+                        secondary: '#4f46e5',
+                        accent: '#a855f7',
+                        darkBg: '#0f172a'
                     }
                 }
             }
         }
     </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+        h1, h2, h3, h4, h5, h6, .font-heading {
+            font-family: 'Outfit', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6366f1;
+        }
+    </style>
+    <script>
+        // Service Worker registration for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered!', reg))
+                    .catch(err => console.error('Service Worker registration failed: ', err));
+            });
+        }
 
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const installBtns = document.querySelectorAll('.install-app-btn');
+            installBtns.forEach(btn => btn.classList.remove('hidden'));
+        });
+
+        function triggerAppInstall() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('App installed successfully');
+                    }
+                    deferredPrompt = null;
+                    const installBtns = document.querySelectorAll('.install-app-btn');
+                    installBtns.forEach(btn => btn.classList.add('hidden'));
+                });
+            }
+        }
+    </script>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-indigo-500 selection:text-white">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
+    <nav class="sticky top-0 bg-slate-900/80 backdrop-blur-lg border-b border-slate-800/80 shadow-lg z-50 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                        <span class="text-white font-extrabold text-lg">B</span>
+                    </div>
                     <div class="flex-shrink-0">
-                        <h1 class="text-2xl font-bold text-primary">Brexbin</h1>
+                        <h1 class="text-2xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Brexbin</h1>
                     </div>
                 </div>
                 <div class="flex items-center">
-                    <button id="mobileMenuBtn" onclick="toggleMobileMenu()" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100">
+                    <button id="mobileMenuBtn" onclick="toggleMobileMenu()" class="md:hidden inline-flex items-center justify-center p-2 rounded-xl text-slate-400 hover:text-indigo-400 hover:bg-slate-800/50 transition-all duration-200">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                         </svg>
                     </button>
-                    <div class="hidden md:flex items-center space-x-4">
-                        <button id="navHomeBtn" onclick="showSection('home')" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Home</button>
-                        <button id="navPaymentBtn" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+                    <div class="hidden md:flex items-center space-x-2">
+                        <button id="navHomeBtn" onclick="showSection('home')" class="text-slate-300 hover:text-indigo-400 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200">Home</button>
+                        <button id="navPaymentBtn" class="text-slate-300 hover:text-indigo-400 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200">
                             <a href="payment.html">Payment</a>
                         </button>
-                        <button id="navJobsBtn" onclick="showSection('jobs')" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Browse Jobs</button>
-                        <button id="navPostBtn" onclick="showSection('post')" class="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-secondary">Post a Job</button>
-                        <button id="navProfileBtn" onclick="showProfile()" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Profile</button>
-                        <a href="wallet.html" id="navWalletBtn" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Wallet</a>
-                        <button id="navGroupChatBtn" onclick="window.location.href='groupchat.html'" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Group Chat</button>
-                        <button id="navNotificationBtn" onclick="toggleNotifications()" class="relative text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <button id="navJobsBtn" onclick="showSection('jobs')" class="text-slate-300 hover:text-indigo-400 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200">Browse Jobs</button>
+                        <button id="navPostBtn" onclick="showSection('post')" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-lg shadow-indigo-500/25 transition-all duration-250 transform hover:scale-[1.02]">Post a Job</button>
+                        <button id="navProfileBtn" onclick="showProfile()" class="text-slate-300 hover:text-indigo-400 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200">Profile</button>
+                        <a href="wallet.html" id="navWalletBtn" class="text-slate-300 hover:text-indigo-400 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200">Wallet</a>
+                        <button id="navGroupChatBtn" onclick="window.location.href='groupchat.html'" class="text-slate-300 hover:text-indigo-400 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200">Group Chat</button>
+                        
+                        <!-- Install App Button for PWA -->
+                        <button onclick="triggerAppInstall()" class="install-app-btn hidden bg-slate-800 text-indigo-400 border border-indigo-500/30 hover:border-indigo-400 hover:bg-slate-700/50 px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            Install App
+                        </button>
+
+                        <button id="navNotificationBtn" onclick="toggleNotifications()" class="relative text-slate-300 hover:text-indigo-400 p-2 rounded-xl transition-all duration-200">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM19 12H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v5a2 2 0 01-2 2z"/>
                             </svg>
-                            <span id="notificationDot" class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full hidden"></span>
+                            <span id="notificationDot" class="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-slate-900 hidden animate-pulse"></span>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-        <div id="mobileMenu" class="md:hidden hidden border-t border-gray-100">
+        <div id="mobileMenu" class="md:hidden hidden border-t border-slate-800/80 bg-slate-900/95 backdrop-blur-xl">
             <div class="px-4 py-3 space-y-2">
-                <button onclick="showSection('home'); toggleMobileMenu(false)" class="w-full text-left text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Home</button>
-                <a href="payment.html" onclick="toggleMobileMenu(false)" class="block w-full text-left text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Payment</a>
-                <button onclick="showSection('jobs'); toggleMobileMenu(false)" class="w-full text-left text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Browse Jobs</button>
-                <button onclick="showSection('post'); toggleMobileMenu(false)" class="w-full text-left bg-primary text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-secondary">Post a Job</button>
-                <button onclick="showProfile(); toggleMobileMenu(false)" class="w-full text-left text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Profile</button>
-                <a href="wallet.html" onclick="toggleMobileMenu(false)" class="block w-full text-left text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Wallet</a>
-                <button onclick="window.location.href='groupchat.html'" class="w-full text-left text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Group Chat</button>
-                <button onclick="toggleNotifications(); toggleMobileMenu(false)" class="w-full text-left text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">Notifications</button>
+                <button onclick="showSection('home'); toggleMobileMenu(false)" class="w-full text-left text-slate-300 hover:text-indigo-400 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200">Home</button>
+                <a href="payment.html" onclick="toggleMobileMenu(false)" class="block w-full text-left text-slate-300 hover:text-indigo-400 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200">Payment</a>
+                <button onclick="showSection('jobs'); toggleMobileMenu(false)" class="w-full text-left text-slate-300 hover:text-indigo-400 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200">Browse Jobs</button>
+                <button onclick="showSection('post'); toggleMobileMenu(false)" class="w-full text-left bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200">Post a Job</button>
+                <button onclick="showProfile(); toggleMobileMenu(false)" class="w-full text-left text-slate-300 hover:text-indigo-400 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200">Profile</button>
+                <a href="wallet.html" onclick="toggleMobileMenu(false)" class="block w-full text-left text-slate-300 hover:text-indigo-400 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200">Wallet</a>
+                <button onclick="window.location.href='groupchat.html'" class="w-full text-left text-slate-300 hover:text-indigo-400 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200">Group Chat</button>
+                <button onclick="triggerAppInstall()" class="install-app-btn hidden w-full text-left text-indigo-400 hover:bg-slate-800 px-3 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                    </svg>
+                    Install App
+                </button>
+                <button onclick="toggleNotifications(); toggleMobileMenu(false)" class="w-full text-left text-slate-300 hover:text-indigo-400 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200">Notifications</button>
             </div>
         </div>
-</nav>
+    </nav>
     <div id="globalStatus" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-3 text-center text-sm"></div>
 <div id="adminDashboard" class="section hidden">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -103,35 +182,37 @@
 
 
     <!-- Notification Panel -->
-    <div id="notificationPanel" class="fixed top-16 right-4 w-80 bg-white rounded-xl shadow-2xl border border-primary/20 z-50 hidden transition-all">
-        <div class="p-4 border-b border-gray-100 flex justify-between items-center">
-            <span class="font-bold text-primary text-lg">Notifications</span>
-            <button onclick="toggleNotifications()" class="text-gray-400 hover:text-primary">
+    <div id="notificationPanel" class="fixed top-20 right-4 w-80 bg-slate-900/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-indigo-500/20 z-50 hidden transition-all duration-300">
+        <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+            <span class="font-bold text-indigo-400 text-lg">Notifications</span>
+            <button onclick="toggleNotifications()" class="text-slate-400 hover:text-indigo-400 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </button>
         </div>
-        <div id="notificationList" class="max-h-64 overflow-y-auto p-4 space-y-3">
-            
-        </div>
+        <div id="notificationList" class="max-h-64 overflow-y-auto p-4 space-y-3"></div>
     </div>
 
     <!-- Home Section -->
     <div id="home" class="section">
         <!-- Hero Section -->
-        <div class="bg-gradient-to-r from-primary to-secondary text-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-                <div class="text-center">
-                    <h2 class="text-4xl font-extrabold sm:text-5xl">
-                        Find Student-Friendly Jobs
+        <div class="relative overflow-hidden bg-slate-900 border-b border-slate-850">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(99,102,241,0.08),transparent_50%)]"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10">
+                <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="text-4xl font-extrabold sm:text-6xl tracking-tight leading-none">
+                        Find Student-Friendly <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Part-Time Jobs</span>
                     </h2>
-                    <p class="mt-4 text-xl">
-                        Connect with flexible opportunities that fit your schedule and help you earn while you learn
+                    <p class="mt-6 text-lg sm:text-xl text-slate-400 leading-relaxed">
+                        Connect with flexible, high-paying opportunities that fit your class schedule and help you earn while you learn.
                     </p>
-                    <div class="mt-8">
-                        <button onclick="showSection('jobs')" class="bg-white text-primary px-8 py-3 rounded-lg text-lg font-medium hover:bg-gray-100 transform hover:scale-105 transition-all">
+                    <div class="mt-10 flex justify-center gap-4">
+                        <button onclick="showSection('jobs')" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-8 py-3.5 rounded-2xl text-lg font-semibold shadow-lg shadow-indigo-500/20 transform hover:scale-[1.03] transition-all duration-250">
                             Browse Jobs Now
+                        </button>
+                        <button onclick="triggerAppInstall()" class="install-app-btn hidden bg-slate-800 hover:bg-slate-750 text-indigo-300 border border-indigo-500/25 px-6 py-3.5 rounded-2xl text-lg font-semibold transition-all duration-200 flex items-center gap-2">
+                            Download App
                         </button>
                     </div>
                 </div>
@@ -139,62 +220,75 @@
         </div>
 
         <!-- Features -->
-        <div class="py-16 bg-white">
+        <div class="py-20 bg-slate-950">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center">
-                    <h3 class="text-3xl font-extrabold text-gray-900">Why Choose Brexbin?</h3>
+                <div class="text-center mb-16">
+                    <h3 class="text-3xl font-bold tracking-tight sm:text-4xl">Why Choose Brexbin?</h3>
+                    <p class="mt-4 text-slate-400">Tailored experience built specifically for student needs</p>
                 </div>
-                <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="text-center p-6">
-                        <div class="bg-primary rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-slate-900/40 backdrop-blur-sm border border-slate-800/80 rounded-2xl p-8 hover:border-indigo-500/35 transition-all duration-300 group">
+                        <div class="bg-indigo-500/10 rounded-2xl w-14 h-14 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
-                        <h4 class="text-xl font-semibold text-gray-900">Flexible Hours</h4>
-                        <p class="mt-2 text-gray-600">Jobs that work around your class schedule</p>
+                        <h4 class="text-xl font-bold text-slate-200">Flexible Hours</h4>
+                        <p class="mt-3 text-slate-400 leading-relaxed">Discover part-time shifts and remote work that align perfectly around your class hours.</p>
                     </div>
-                    <div class="text-center p-6">
-                        <div class="bg-primary rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-slate-900/40 backdrop-blur-sm border border-slate-800/80 rounded-2xl p-8 hover:border-indigo-500/35 transition-all duration-300 group">
+                        <div class="bg-indigo-500/10 rounded-2xl w-14 h-14 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
                             </svg>
                         </div>
-                        <h4 class="text-xl font-semibold text-gray-900">Fair Pay</h4>
-                        <p class="mt-2 text-gray-600">Competitive wages for student positions</p>
+                        <h4 class="text-xl font-bold text-slate-200">Instant Payments</h4>
+                        <p class="mt-3 text-slate-400 leading-relaxed">Get paid directly to your Naira or USD wallet, send peer transfers, and withdraw instantly.</p>
                     </div>
-                    <div class="text-center p-6">
-                        <div class="bg-primary rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-slate-900/40 backdrop-blur-sm border border-slate-800/80 rounded-2xl p-8 hover:border-indigo-500/35 transition-all duration-300 group">
+                        <div class="bg-indigo-500/10 rounded-2xl w-14 h-14 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                             </svg>
                         </div>
-                        <h4 class="text-xl font-semibold text-gray-900">Quick Apply</h4>
-                        <p class="mt-2 text-gray-600">Simple application process</p>
+                        <h4 class="text-xl font-bold text-slate-200">1-Click Apply</h4>
+                        <p class="mt-3 text-slate-400 leading-relaxed">No complicated resumes needed. Apply directly with your customized student profile page.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- Calendar Section -->
     <div id="calendar" class="section hidden">
-        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div class="bg-white rounded-lg shadow-lg p-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Calendar</h2>
-                <div class="flex justify-between items-center mb-4">
-                    <button id="prevMonth" class="bg-primary text-white px-3 py-1 rounded hover:bg-secondary">&lt;</button>
-                    <div id="calendarMonthLabel" class="font-semibold text-lg"></div>
-                    <button id="nextMonth" class="bg-primary text-white px-3 py-1 rounded hover:bg-secondary">&gt;</button>
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="bg-slate-900/70 backdrop-blur-md rounded-3xl shadow-xl border border-slate-800 p-8">
+                <h2 class="text-3xl font-bold text-slate-200 mb-8 tracking-tight flex items-center gap-2">
+                    <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    Job Calendar
+                </h2>
+                <div class="flex justify-between items-center mb-6">
+                    <button id="prevMonth" class="bg-slate-800 hover:bg-slate-700 text-slate-200 w-10 h-10 rounded-xl flex items-center justify-center border border-slate-700 transition-colors">&lt;</button>
+                    <div id="calendarMonthLabel" class="font-bold text-lg text-indigo-400"></div>
+                    <button id="nextMonth" class="bg-slate-800 hover:bg-slate-700 text-slate-200 w-10 h-10 rounded-xl flex items-center justify-center border border-slate-700 transition-colors">&gt;</button>
                 </div>
-                <div id="calendarContainer"></div>
-                <div class="mt-6">
-                    <h3 class="text-lg font-semibold mb-2">Add Event</h3>
-                    <form id="eventForm" class="flex flex-col gap-2 md:flex-row md:items-end md:gap-4" onsubmit="addCalendarEvent(event)">
-                        <input type="date" id="eventDate" required class="border border-gray-300 rounded px-2 py-1">
-                        <input type="text" id="eventTitle" placeholder="Event Title" required class="border border-gray-300 rounded px-2 py-1 flex-1">
-                        <button type="submit" class="bg-primary text-white px-4 py-1 rounded hover:bg-secondary">Add</button>
+                <div id="calendarContainer" class="mb-8"></div>
+                <div class="border-t border-slate-800 pt-8">
+                    <h3 class="text-xl font-bold mb-4 text-slate-200">Add Schedule/Event</h3>
+                    <form id="eventForm" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end" onsubmit="addCalendarEvent(event)">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-400 mb-2">Date</label>
+                            <input type="date" id="eventDate" required class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-400 mb-2">Event Title</label>
+                            <input type="text" id="eventTitle" placeholder="Interview, shift start..." required class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors">
+                        </div>
+                        <button type="submit" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold py-3.5 px-6 rounded-xl transition-all duration-200 shadow-md">Add Schedule</button>
                     </form>
-                    <div id="eventList" class="mt-4"></div>
+                    <div id="eventList" class="mt-6 space-y-2"></div>
                 </div>
             </div>
         </div>
@@ -389,171 +483,183 @@ document.addEventListener('DOMContentLoaded', function() {
     </script>
     <!-- Jobs Section -->
     <div id="jobs" class="section hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="mb-8">
-                <h2 class="text-3xl font-bold text-gray-900">Available Student Jobs</h2>
-                <p class="text-gray-600 mt-2">Find flexible opportunities that fit your schedule</p>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="mb-10 flex justify-between items-end">
+                <div>
+                    <h2 class="text-3xl font-bold tracking-tight text-slate-100 sm:text-4xl">Available Student Jobs</h2>
+                    <p class="text-slate-400 mt-2">Find flexible opportunities that fit your schedule and skills</p>
+                </div>
             </div>
 
             <!-- Filters -->
-          <div class="mb-6 flex flex-wrap gap-4">
-    <select id="countryFilter" class="border border-gray-300 rounded-md px-3 py-2">
-        <option value="">All Countries</option>
-        <option value="United States">United States</option>
-        
-        
-    </select>
-    <select id="categoryFilter" class="border border-gray-300 rounded-md px-3 py-2">
-        <option value="">All Categories</option>
-        <option value="full-stack">Full Stack</option>
-        <option value="backend">Backend</option>
-        <option value="frontend">Frontend</option>
-        <option value="mobile">Mobile</option>
-        <option value="data">Data</option>
-        <option value="devops">DevOps</option>
-        <option value="security">Security</option>
-        <option value="qa">QA</option>
-        <option value="design">Design</option>
-        <option value="product">Product</option>
-        <option value="marketing">Marketing</option>
-        <option value="sales">Sales</option>
-        <option value="support">Support</option>
-        <option value="other">Other</option>
-    </select>
-    <select id="payFilter" class="border border-gray-300 rounded-md px-3 py-2">
-        <option value="">All Pay Ranges</option>
-        <option value="10-15">$10-$15/hour</option>
-        <option value="10-20">$10-$20/hour</option>
-        <option value="20+">$20+/hour</option>
-    </select>
-    <button onclick="filterJobs()" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-secondary">Apply Filters</button>
-</div>
-
+            <div class="bg-slate-900/60 backdrop-blur-md border border-slate-800 rounded-2xl p-6 mb-8 flex flex-wrap gap-4 items-center">
+                <div class="flex-1 min-w-[200px]">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Country</label>
+                    <select id="countryFilter" class="bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 w-full text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors">
+                        <option value="">All Countries</option>
+                        <option value="United States">United States</option>
+                        <option value="Remote">Remote / Worldwide</option>
+                    </select>
+                </div>
+                <div class="flex-1 min-w-[200px]">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Category</label>
+                    <select id="categoryFilter" class="bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 w-full text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors">
+                        <option value="">All Categories</option>
+                        <option value="full-stack">Full Stack</option>
+                        <option value="backend">Backend</option>
+                        <option value="frontend">Frontend</option>
+                        <option value="mobile">Mobile</option>
+                        <option value="data">Data</option>
+                        <option value="devops">DevOps</option>
+                        <option value="security">Security</option>
+                        <option value="qa">QA</option>
+                        <option value="design">Design</option>
+                        <option value="product">Product</option>
+                        <option value="marketing">Marketing</option>
+                        <option value="sales">Sales</option>
+                        <option value="support">Support</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="flex-1 min-w-[200px]">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Pay Range</label>
+                    <select id="payFilter" class="bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 w-full text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors">
+                        <option value="">All Pay Ranges</option>
+                        <option value="10-15">$10-$15/hour</option>
+                        <option value="10-20">$10-$20/hour</option>
+                        <option value="20+">$20+/hour</option>
+                    </select>
+                </div>
+                <div class="pt-6">
+                    <button onclick="filterJobs()" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/20">Apply Filters</button>
+                </div>
             </div>
 
             <!-- Job Listings -->
-            <div id="jobListings" class="space-y-4">
-            
-            </div>
+            <div id="jobListings" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
         </div>
     </div>
 
-        <!-- Post Job  -->
+    <!-- Post Job -->
     <div id="post" class="section hidden">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="bg-white rounded-lg shadow-lg p-8">
-                <h2 class="text-3xl font-bold text-gray-900 mb-6">Post a Student Job</h2>
-                <form id="postJobForm" class="space-y-6" onsubmit="postJob(event)"></form>
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="bg-slate-900/60 backdrop-blur-md rounded-3xl shadow-xl border border-slate-800 p-8">
+                <h2 class="text-3xl font-bold text-slate-200 mb-6 tracking-tight flex items-center gap-2">
+                    <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    Post a Student Job
+                </h2>
+                <form id="postJobForm" class="space-y-6" onsubmit="postJob(event)">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Job Title</label>
-                        <input type="text" id="jobTitle" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <label class="block text-sm font-semibold text-slate-400 mb-2">Job Title</label>
+                        <input type="text" id="jobTitle" required class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="e.g. Junior Web Developer">
                     </div>
-                    
-                    <form id="postJobForm" class="space-y-6" onsubmit="postJob(event)">
-    
-    <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Company/Organization</label>
-        <input type="text" id="company" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
-            <select id="jobCategory" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-                <option value="">Select Category</option>
-                
-                <option value="remote">Remote Work</option>
-                
-            </select>
-        </div>
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Hourly Pay</label>
-            <input type="number" id="hourlyPay" min="10" max="50" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-        </div>
-    </div>
-    <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
-        <input type="text" id="location" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-    </div>
-    <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Job Description</label>
-        <textarea id="description" rows="4" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
-    </div>
-    <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Requirements</label>
-        <textarea id="requirements" rows="3" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
-    </div>
-    <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
-        <input type="email" id="contactEmail" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-    </div>
-    <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-md hover:bg-secondary font-medium">Post Job</button>
-</form>
-<div id="postJobStatus" class="mt-4 text-center text-sm"></div>
-
-                        
-                     
-                    
-                </form><form id="applicationForm" onsubmit="submitApplication(event)"></form>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-400 mb-2">Company / Organization</label>
+                        <input type="text" id="company" required class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="Company Name">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-400 mb-2">Category</label>
+                            <select id="jobCategory" required class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors">
+                                <option value="">Select Category</option>
+                                <option value="full-stack">Full Stack</option>
+                                <option value="backend">Backend</option>
+                                <option value="frontend">Frontend</option>
+                                <option value="mobile">Mobile</option>
+                                <option value="data">Data Science</option>
+                                <option value="design">UI/UX Design</option>
+                                <option value="other">Other / General</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-400 mb-2">Hourly Pay ($)</label>
+                            <input type="number" id="hourlyPay" min="5" max="150" required class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="e.g. 20">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-400 mb-2">Location / Restriction</label>
+                        <input type="text" id="location" required class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="e.g. Worldwide, US Only, or Hybrid Lagos">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-400 mb-2">Job Description</label>
+                        <textarea id="description" rows="4" required class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="Explain the tasks and responsibilities..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-400 mb-2">Requirements</label>
+                        <textarea id="requirements" rows="3" class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="List tools, languages, or skills required..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-400 mb-2">Contact Email</label>
+                        <input type="email" id="contactEmail" required class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="recruiter@email.com">
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold py-4 rounded-xl transition-all duration-200 shadow-lg shadow-indigo-500/25">Post Job Opening</button>
+                </form>
                 <div id="postJobStatus" class="mt-4 text-center text-sm"></div>
             </div>
         </div>
     </div>
-    
-    
 
     <!-- Profile Section -->
-    
-<div id="profile" class="section hidden">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="relative bg-gradient-to-br from-primary via-blue-400 to-secondary rounded-3xl shadow-2xl p-2">
-            <div class="bg-white rounded-2xl p-10 shadow-lg flex flex-col md:flex-row gap-10 items-start">
-                <!-- Avatar -->
-                <div class="flex-shrink-0 flex flex-col items-center w-full md:w-1/3">
-                    <div class="w-40 h-40 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-lg border-4 border-white mb-4">
-                        <span class="text-6xl font-bold text-white select-none">
-                            <script>
-                                // Render initials for avatar
-                                (function() {
-                                    const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
-                                    if (user && user.name) {
-                                        document.write(user.name.split(' ').map(n => n[0]).join('').toUpperCase());
-                                    } else {
-                                        document.write('U');
-                                    }
-                                })();
-                            </script>
-                        </span>
+    <div id="profile" class="section hidden">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="relative bg-gradient-to-br from-indigo-500/30 via-purple-500/10 to-slate-900 rounded-3xl border border-slate-800 p-8 shadow-2xl">
+                <div class="flex flex-col lg:flex-row gap-10 items-start">
+                    <!-- Avatar & Pin settings -->
+                    <div class="flex-shrink-0 flex flex-col items-center w-full lg:w-1/3 bg-slate-900/60 backdrop-blur-md rounded-2xl border border-slate-800 p-6">
+                        <div class="w-32 h-32 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-xl border-4 border-slate-800 mb-4 select-none">
+                            <span class="text-5xl font-bold text-white" id="profileInitialsDisplay">U</span>
+                        </div>
+                        
+                        <div class="w-full mt-6 border-t border-slate-800 pt-6">
+                            <h4 class="text-sm font-bold text-slate-300 mb-3">Wallet PIN Settings</h4>
+                            <input type="password" id="setPin" maxlength="6" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 w-full text-center text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors text-lg tracking-widest" placeholder="••••••">
+                            <button onclick="saveWalletPin()" class="bg-slate-800 hover:bg-slate-700 text-indigo-400 border border-indigo-500/30 font-semibold py-2 px-4 rounded-xl mt-3 w-full transition-colors">Save Wallet PIN</button>
+                            <div id="pinStatus" class="mt-2 text-center text-xs"></div>
+                        </div>
                     </div>
-                    <!-- Set/Change Wallet PIN -->
-                    <div class="w-full">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Wallet PIN</label>
-                        <input type="password" id="setPin" maxlength="6" class="w-full border border-gray-300 rounded-md px-3 py-2" placeholder="Enter new PIN">
-                        <button onclick="saveWalletPin()" class="bg-primary text-white px-4 py-2 rounded-md mt-2 w-full">Save PIN</button>
-                        <div id="pinStatus" class="mt-2 text-sm"></div>
-                    </div>
-                </div>
-                <!-- Profile Info -->
-                <div class="flex-1 w-full">
-                    <h2 class="text-4xl font-extrabold text-primary mb-3" id="profileNameDisplay"></h2>
-                    <p class="text-lg text-gray-700 italic mb-4" id="profileBioDisplay"></p>
-                    <div class="mb-4">
-                        <span class="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full font-semibold text-sm mr-2">Likes</span>
-                        <span class="text-gray-600" id="profileLikesDisplay"></span>
-                    </div>
-                    <div>
-                        <span class="font-semibold text-gray-800">Email:</span>
-                        <span class="text-gray-600" id="profileEmailDisplay"></span>
-                    </div>
-                    <div class="mt-8 flex flex-wrap gap-4">
-                        <button onclick="editProfile()" class="bg-primary text-white px-8 py-3 rounded-md hover:bg-secondary font-medium shadow transition">Edit Profile</button>
-                        <button onclick="logoutProfile()" class="bg-gray-200 text-gray-700 px-8 py-3 rounded-md hover:bg-gray-300 font-medium shadow transition">Logout</button>
-                        <button id="changePasswordBtn" onclick="openChangePasswordModal()" class="bg-yellow-500 text-white px-8 py-3 rounded-md hover:bg-yellow-600 font-medium shadow transition">Change Password</button>
+                    
+                    <!-- Profile Info & Bookmarked Jobs -->
+                    <div class="flex-1 w-full space-y-8">
+                        <div class="bg-slate-900/40 backdrop-blur-sm border border-slate-800 rounded-2xl p-6">
+                            <h2 class="text-3xl font-extrabold tracking-tight text-slate-100 mb-2" id="profileNameDisplay">Student User</h2>
+                            <p class="text-slate-400 italic mb-4" id="profileBioDisplay">No bio set yet.</p>
+                            
+                            <div class="flex flex-wrap gap-2 items-center mb-6">
+                                <span class="bg-indigo-500/10 text-indigo-400 text-xs font-semibold px-2.5 py-1 rounded-full border border-indigo-500/25">Skills / Interests</span>
+                                <span class="text-slate-300 text-sm" id="profileLikesDisplay">None specified</span>
+                            </div>
+                            
+                            <div class="text-sm text-slate-400">
+                                <span class="font-semibold text-slate-300">Registered Email:</span>
+                                <span id="profileEmailDisplay">student@email.com</span>
+                            </div>
+                            
+                            <div class="mt-6 flex flex-wrap gap-3">
+                                <button onclick="editProfile()" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-all shadow-md">Edit Profile</button>
+                                <button id="changePasswordBtn" onclick="openChangePasswordModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold px-6 py-2.5 rounded-xl transition-colors">Change Password</button>
+                                <button onclick="logoutProfile()" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-semibold px-6 py-2.5 rounded-xl border border-rose-500/25 transition-colors">Logout</button>
+                            </div>
+                        </div>
+
+                        <!-- Bookmarked / Saved Jobs section -->
+                        <div class="bg-slate-900/40 backdrop-blur-sm border border-slate-800 rounded-2xl p-6">
+                            <h3 class="text-xl font-bold text-slate-200 mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"></path>
+                                </svg>
+                                Bookmarked Job Openings
+                            </h3>
+                            <div id="savedJobsList" class="space-y-3">
+                                <p class="text-slate-500 text-sm">No bookmarked jobs yet.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
      
     
     
@@ -687,6 +793,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
                     <input type="password" id="signupPassword" required class="w-full border border-gray-300 rounded-md px-3 py-2">
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Security Question</label>
+                    <input type="text" id="signupSecurityQuestion" required class="w-full border border-gray-300 rounded-md px-3 py-2" placeholder="e.g. Your favorite color?">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Security Answer</label>
+                    <input type="text" id="signupSecurityAnswer" required class="w-full border border-gray-300 rounded-md px-3 py-2" placeholder="Answer">
+                </div>
                 <button type="submit" class="w-full bg-primary text-white py-3 px-4 rounded-md hover:bg-secondary font-medium">Sign Up</button>
             </form>
             <div id="signupStatus" class="mt-4 text-center text-sm"></div>
@@ -728,9 +842,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                     <input type="email" id="resetEmail" required class="w-full border border-gray-300 rounded-md px-3 py-2">
                 </div>
-                <div id="verificationCodeDiv" class="hidden">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Verification Code</label>
-                    <input type="text" id="resetVerificationCode" class="w-full border border-gray-300 rounded-md px-3 py-2" placeholder="Enter the code sent to your email">
+                <div id="securityQuestionDiv" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-2" id="securityQuestionLabel"></label>
+                    <input type="text" id="resetSecurityAnswer" class="w-full border border-gray-300 rounded-md px-3 py-2">
                 </div>
                 <div id="newPasswordDiv" class="hidden">
                     <label class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
@@ -943,6 +1057,8 @@ async function signup(event) {
     event.preventDefault();
     const email = document.getElementById('signupEmail').value.trim();
     const password = document.getElementById('signupPassword').value;
+    const securityQuestion = document.getElementById('signupSecurityQuestion').value.trim();
+    const securityAnswer = document.getElementById('signupSecurityAnswer').value.trim().toLowerCase();
     let users = getUsers();
     if (users.find(u => u.email === email)) {
         showStatus('signupStatus', 'Email already registered.', true);
@@ -951,9 +1067,9 @@ async function signup(event) {
     try {
         await apiRequest('/register', {
             method: 'POST',
-            body: { email, password }
+            body: { email, password, securityQuestion, securityAnswer }
         });
-        const user = { email, password, name: '', bio: '', likes: [] };
+        const user = { email, password, name: '', bio: '', likes: [], securityQuestion, securityAnswer };
         if (email === "admin@brexbin.com") user.isAdmin = true;
         users.push(user);
         setUsers(users);
@@ -996,8 +1112,7 @@ function openResetPasswordModal() {
     document.getElementById('resetPasswordModal').classList.remove('hidden');
     document.getElementById('resetPasswordModal').classList.add('flex');
     document.getElementById('resetEmail').value = '';
-    document.getElementById('resetVerificationCode').value = '';
-    document.getElementById('verificationCodeDiv').classList.add('hidden');
+    document.getElementById('securityQuestionDiv').classList.add('hidden');
     document.getElementById('newPasswordDiv').classList.add('hidden');
     document.getElementById('resetPasswordStatus').textContent = '';
     resetUser = null;
@@ -1017,8 +1132,9 @@ function resetPassword(event) {
             body: { email }
         }).then(result => {
             resetUser = { email };
-            document.getElementById('verificationCodeDiv').classList.remove('hidden');
-            status.textContent = result.message || "Enter the verification code sent to your email.";
+            document.getElementById('securityQuestionLabel').textContent = result.securityQuestion || 'Security Question';
+            document.getElementById('securityQuestionDiv').classList.remove('hidden');
+            status.textContent = "Answer your security question to continue.";
             status.className = "text-gray-700 mt-2";
         }).catch(err => {
             status.textContent = err.message || "No account found with that email.";
@@ -1038,7 +1154,7 @@ function resetPassword(event) {
             method: 'POST',
             body: {
                 email: resetUser.email,
-                verificationCode: document.getElementById('resetVerificationCode').value.trim(),
+                securityAnswer: document.getElementById('resetSecurityAnswer').value.trim(),
                 newPassword: newPass
             }
         }).then(() => {
@@ -1054,10 +1170,10 @@ function resetPassword(event) {
         });
         return;
     }
-    // Step 2: Confirm verification code entry
-    const code = document.getElementById('resetVerificationCode').value.trim();
-    if (!code) {
-        status.textContent = "Please enter the verification code.";
+    // Step 2: Check security answer
+    const answer = document.getElementById('resetSecurityAnswer').value.trim();
+    if (!answer) {
+        status.textContent = "Please enter your answer.";
         status.className = "text-red-500 mt-2";
         return;
     }
@@ -1204,6 +1320,44 @@ function resetPassword(event) {
             renderProfile();
         }
 
+        function renderSavedJobs() {
+            const email = getCurrentUserEmail();
+            const list = document.getElementById('savedJobsList');
+            if (!list) return;
+            if (!email) {
+                list.innerHTML = '<p class="text-slate-500 text-sm">Please log in to see bookmarked jobs.</p>';
+                return;
+            }
+            const saved = JSON.parse(localStorage.getItem('savedJobs_' + email) || '[]');
+            const bookmarked = jobs.filter(j => saved.includes(j.id));
+            if (bookmarked.length === 0) {
+                list.innerHTML = '<p class="text-slate-500 text-sm">No bookmarked jobs yet.</p>';
+                return;
+            }
+            list.innerHTML = bookmarked.map(job => `
+                <div class="flex justify-between items-center bg-slate-800/40 border border-slate-700/60 p-4 rounded-xl">
+                    <div>
+                        <h4 class="font-bold text-slate-200">${job.title}</h4>
+                        <p class="text-xs text-slate-400">${job.company} — ${job.location}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        ${job.applyUrl ? `<a href="${job.applyUrl}" target="_blank" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg transition-colors font-medium">Apply</a>` : ''}
+                        <button onclick="removeSavedJob(${job.id})" class="text-rose-400 hover:text-rose-500 text-xs font-semibold px-2 py-1">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removeSavedJob(jobId) {
+            const email = getCurrentUserEmail();
+            if (!email) return;
+            let saved = JSON.parse(localStorage.getItem('savedJobs_' + email) || '[]');
+            saved = saved.filter(id => id !== jobId);
+            localStorage.setItem('savedJobs_' + email, JSON.stringify(saved));
+            renderSavedJobs();
+            addNotification("Bookmark removed.");
+        }
+
         function renderProfile() {
             const user = getCurrentUser();
             if (!user) {
@@ -1214,40 +1368,13 @@ function resetPassword(event) {
             document.getElementById('profileBioDisplay').textContent = user.bio || 'No bio yet.';
             document.getElementById('profileLikesDisplay').textContent = user.likes && user.likes.length ? user.likes.join(', ') : 'None listed.';
             document.getElementById('profileEmailDisplay').textContent = user.email;
-            
-            const profileContent = document.getElementById('profileContent');
-            if (!profileContent) {
-                console.error('Profile content element not found');
-                return;
-            }
-            
-            profileContent.innerHTML = '';
-            
-            if (!user) {
-                profileContent.innerHTML = '<p class="text-red-500">No user data available. Please log in.</p>';
-                return;
-            }
-            // Create profile content
-            document.getElementById('profileNameDisplay').textContent = user.name || 'No Name Set';
-            document.getElementById('profileBioDisplay').textContent = user.bio || 'No bio yet.';
-            document.getElementById('profileLikesDisplay').textContent = user.likes && user.likes.length ? user.likes.join(', ') : 'None listed.';
-            document.getElementById('profileEmailDisplay').textContent = user.email;
-            
-            const content = document.getElementById('profileContent');
-            content.innerHTML = `
-                <div>
-                    <h3 class="text-xl font-semibold text-gray-900">${user.name || 'No Name Set'}</h3>
-                    <p class="text-gray-700 mt-2">${user.bio || 'No bio yet.'}</p>
-                    <div class="mt-4">
-                        <span class="font-semibold text-gray-800">Likes:</span>
-                        <span class="text-gray-600">${user.likes ? user.likes.join(', ') : 'None listed.'}</span>
-                    </div>
-                    <div class="mt-4">
-                        <span class="font-semibold text-gray-800">Email:</span>
-                        <span class="text-gray-600">${user.email}</span>
-                    </div>
-                </div>
-            `;
+
+            // Render initials
+            const initials = user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U';
+            document.getElementById('profileInitialsDisplay').textContent = initials;
+
+            // Render saved/bookmarked jobs
+            renderSavedJobs();
         }
 
         function editProfile() {
@@ -1809,59 +1936,82 @@ async function loadJobs() {
         function displayJobs(jobsToShow) {
     const container = document.getElementById('jobListings');
     container.innerHTML = '';
+    const email = getCurrentUserEmail();
+    const saved = email ? JSON.parse(localStorage.getItem('savedJobs_' + email) || '[]') : [];
 
     jobsToShow.forEach(job => {
         const payLabel = job.pay && job.pay > 0
             ? `$${job.pay}/hr`
             : (job.salaryLabel ? job.salaryLabel : 'Pay not listed');
+        const isSaved = saved.includes(job.id);
         const jobCard = document.createElement('div');
-        jobCard.className = 'bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow';
+        jobCard.className = 'bg-slate-900/60 backdrop-blur-md rounded-2xl border border-slate-800 p-6 hover:border-indigo-500/40 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 flex flex-col justify-between';
         jobCard.innerHTML = `
-            <div class="flex justify-between items-start mb-4">
-                <div>
-                    <h3 class="text-xl font-semibold text-gray-900">${job.title}</h3>
-                    <p class="text-gray-600">${job.company}</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-2xl font-bold text-primary">${payLabel}</p>
-                    <p class="text-sm text-gray-500">${getPostedLabel(job.posted)}</p>
-                </div>
-            </div>
-            <div class="mb-4">
-                <p class="text-gray-700 mb-2">${job.description}</p>
-                <p class="text-sm text-gray-600"><strong>Requirements:</strong> ${job.requirements}</p>
-                ${job.sourceName ? `
-                    <p class="text-xs text-gray-500 mt-2">Source: 
-                        <a href="${job.sourceUrl || '#'}" target="_blank" rel="noopener" class="text-primary hover:underline">${job.sourceName}</a>
-                    </p>
-                ` : ''}
-            </div>
-            <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-4">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary text-white">
-                        ${formatCategoryLabel(job.category)}
-                    </span>
-                    <span class="text-sm text-gray-500">
-                        <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <div>
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-100">${job.title}</h3>
+                        <p class="text-indigo-400 font-semibold text-sm">${job.company}</p>
+                    </div>
+                    <button onclick="toggleBookmark(${job.id}, this)" class="text-slate-400 hover:text-yellow-500 transition-colors p-1.5 rounded-xl hover:bg-slate-800">
+                        <svg class="w-5 h-5 ${isSaved ? 'text-yellow-500 fill-current' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.36 1.248.58 1.823l-3.97 2.883a1 1 0 00-.364 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.971-2.883a1 1 0 00-1.18 0l-3.97 2.883c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118L2.05 10.114c-.78-.575-.382-1.823.582-1.823h4.906a1 1 0 00.95-.69l1.519-4.674z"/>
                         </svg>
-                        ${job.location}
-                    </span>
-                </div>
-                ${job.applyUrl ? `
-                    <a href="${job.applyUrl}" target="_blank" rel="noopener" class="bg-primary text-white px-6 py-2 rounded-md hover:bg-secondary font-medium">
-                        Apply Now
-                    </a>
-                ` : `
-                    <button disabled class="bg-gray-300 text-gray-500 px-6 py-2 rounded-md font-medium cursor-not-allowed">
-                        No External Link
                     </button>
-                `}
+                </div>
+                <p class="text-slate-300 text-sm mb-4 line-clamp-3">${job.description}</p>
+                <div class="bg-slate-950/40 rounded-xl p-3 mb-4 border border-slate-800/60 text-xs text-slate-400">
+                    <span class="font-semibold text-slate-300">Requirements:</span> ${job.requirements || 'None specified'}
+                </div>
+            </div>
+            <div>
+                <div class="flex justify-between items-center mt-4 pt-4 border-t border-slate-800/80">
+                    <div>
+                        <p class="text-xl font-bold text-slate-100">${payLabel}</p>
+                        <p class="text-xs text-slate-500">${getPostedLabel(job.posted)}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/25 uppercase">
+                            ${formatCategoryLabel(job.category)}
+                        </span>
+                    </div>
+                </div>
+                <div class="mt-4 flex gap-2">
+                    ${job.applyUrl ? `
+                        <a href="${job.applyUrl}" target="_blank" rel="noopener" class="flex-1 text-center bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white py-2.5 rounded-xl font-semibold transition-all duration-200 shadow-md text-sm">
+                            Apply Direct
+                        </a>
+                    ` : `
+                        <button disabled class="flex-1 bg-slate-800 text-slate-500 py-2.5 rounded-xl font-semibold cursor-not-allowed text-sm border border-slate-700/60">
+                            Apply via Profile
+                        </button>
+                    `}
+                </div>
             </div>
         `;
         container.appendChild(jobCard);
     });
+}
+
+function toggleBookmark(jobId, btnElement) {
+    const email = getCurrentUserEmail();
+    if (!email) {
+        showStatus('globalStatus', 'Please log in to bookmark jobs.', true);
+        return;
+    }
+    let saved = JSON.parse(localStorage.getItem('savedJobs_' + email) || '[]');
+    const icon = btnElement.querySelector('svg');
+    if (saved.includes(jobId)) {
+        saved = saved.filter(id => id !== jobId);
+        icon.classList.remove('text-yellow-500', 'fill-current');
+        addNotification("Bookmark removed");
+    } else {
+        saved.push(jobId);
+        icon.classList.add('text-yellow-500', 'fill-current');
+        addNotification("Job bookmarked!");
+    }
+    localStorage.setItem('savedJobs_' + email, JSON.stringify(saved));
+    renderSavedJobs();
 }
 
         function filterJobs() {

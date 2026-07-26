@@ -2,36 +2,88 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Brexbin Students Wallet</title>
+    <title>Brexbin Student Wallet</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#4f46e5',
+                        accent: '#a855f7',
+                        darkBg: '#0f172a'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+        h1, h2, h3, h4, h5, h6, .font-heading {
+            font-family: 'Outfit', sans-serif;
+        }
+    </style>
+    <script>
+        // PWA registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js');
+            });
+        }
+    </script>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <nav class="bg-white shadow-lg mb-8">
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+    <nav class="sticky top-0 bg-slate-900/85 backdrop-blur-md border-b border-slate-800 shadow-lg z-50 transition-all">
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-primary">Brexbin Student Wallet</h1>
-            <a href="sudents.html" class="text-primary hover:underline">Back to Dashboard</a>
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <span class="text-white font-extrabold text-sm">B</span>
+                </div>
+                <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Student Wallet</h1>
+            </div>
+            <a href="index.html" class="text-slate-300 hover:text-indigo-400 text-sm font-semibold transition-colors flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Dashboard
+            </a>
         </div>
     </nav>
-    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-8 mt-8">
-        <h2 id="walletTitle" class="text-2xl font-bold text-primary mb-6">Wallet</h2>
-        <div id="walletContent"></div>
+
+    <div class="max-w-5xl mx-auto px-4 py-8">
+        <div class="bg-slate-900/60 backdrop-blur-md rounded-3xl border border-slate-800 p-8 shadow-2xl">
+            <div class="flex justify-between items-center mb-8 border-b border-slate-800 pb-6">
+                <h2 id="walletTitle" class="text-3xl font-extrabold text-slate-200 tracking-tight">Wallet Status</h2>
+                <div id="actionButtons" class="flex gap-2"></div>
+            </div>
+            <div id="walletContent" class="space-y-6"></div>
+        </div>
     </div>
 
     <!-- Transfer Modal (Admin only) -->
-    <div id="adminTransferModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
-            <h3 class="text-xl font-bold text-gray-900 mb-4" id="transferTitle">Transfer</h3>
+    <div id="adminTransferModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <h3 class="text-2xl font-bold text-slate-200 mb-6" id="transferTitle">Transfer</h3>
             <form id="transferForm" class="space-y-4" onsubmit="adminTransfer(event)">
                 <input type="hidden" id="transferUserEmail">
                 <input type="hidden" id="transferCurrency">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Amount</label>
-                    <input type="number" id="transferAmount" min="1" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    <label class="block text-sm font-semibold text-slate-400 mb-2">Amount</label>
+                    <input type="number" id="transferAmount" min="1" required class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors">
                 </div>
-                <div class="flex space-x-3">
-                    <button type="submit" class="flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary">Send</button>
-                    <button type="button" onclick="closeTransferModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400">Cancel</button>
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-lg shadow-indigo-500/20">Send</button>
+                    <button type="button" onclick="closeTransferModal()" class="flex-1 bg-slate-800 hover:bg-slate-750 text-slate-300 font-semibold py-3 px-4 rounded-xl transition-colors border border-slate-700/60">Cancel</button>
                 </div>
             </form>
             <div id="transferStatus" class="mt-4 text-center text-sm"></div>
@@ -39,44 +91,46 @@
     </div>
 
     <!-- Withdraw Modal -->
-    <div id="withdrawModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
-            <h3 class="text-xl font-bold text-gray-900 mb-4" id="withdrawTitle">Withdraw</h3>
+    <div id="withdrawModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <h3 class="text-2xl font-bold text-slate-200 mb-6" id="withdrawTitle">Withdraw</h3>
             <form id="withdrawForm" class="space-y-4" onsubmit="withdrawHandler(event)">
                 <input type="hidden" id="withdrawUserEmail">
                 <input type="hidden" id="withdrawCurrency">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Amount</label>
-                    <input type="number" id="withdrawAmount" min="1" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                    <label class="block text-sm font-semibold text-slate-400 mb-2">Amount</label>
+                    <input type="number" id="withdrawAmount" min="1" required class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors">
                 </div>
-                <div id="nairaFields" class="hidden">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Bank Name (Naira)</label>
-                    <select id="nairaBank" class="w-full border border-gray-300 rounded-md px-3 py-2 mb-2" required>
-                        <option value="">Select Bank</option>
-                        <option value="Opay">Opay</option>
-                        <option value="Zenith">Zenith</option>
-                        <option value="Palmpay">Palmpay</option>
-                        <option value="Stanbic">Stanbic</option>
-                        <option value="GTBank">GTBank</option>
-                        <option value="Access">Access</option>
-                        <option value="UBA">UBA</option>
-                        <option value="Fidelity">Fidelity</option>
-                        <option value="Kuda">Kuda</option>
-                    </select>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Bank Account Number</label>
-                    <input type="text" id="nairaAccount" class="w-full border border-gray-300 rounded-md px-3 py-2" placeholder="Account Number" required>
+                <div id="nairaFields" class="hidden space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-400 mb-2">Bank Name</label>
+                        <select id="nairaBank" class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors">
+                            <option value="">Select Bank</option>
+                            <option value="Opay">Opay</option>
+                            <option value="Zenith">Zenith</option>
+                            <option value="Palmpay">Palmpay</option>
+                            <option value="Stanbic">Stanbic</option>
+                            <option value="GTBank">GTBank</option>
+                            <option value="Access">Access</option>
+                            <option value="UBA">UBA</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-400 mb-2">Account Number</label>
+                        <input type="text" id="nairaAccount" class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="10-digit number">
+                    </div>
                 </div>
                 <div id="dollarFields" class="hidden">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">PayPal Email (Dollar)</label>
-                    <input type="email" id="paypalEmail" class="w-full border border-gray-300 rounded-md px-3 py-2" placeholder="your@email.com">
+                    <label class="block text-sm font-semibold text-slate-400 mb-2">PayPal Email</label>
+                    <input type="email" id="paypalEmail" class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="your@email.com">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Wallet PIN</label>
-                    <input type="password" id="walletPin" class="w-full border border-gray-300 rounded-md px-3 py-2" required>
+                    <label class="block text-sm font-semibold text-slate-400 mb-2">Wallet PIN</label>
+                    <input type="password" id="walletPin" class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-center text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors tracking-widest text-lg" required placeholder="••••">
                 </div>
-                <div class="flex space-x-3">
-                    <button type="submit" class="flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary">Withdraw</button>
-                    <button type="button" onclick="closeWithdrawModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400">Cancel</button>
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-lg shadow-indigo-500/20">Withdraw</button>
+                    <button type="button" onclick="closeWithdrawModal()" class="flex-1 bg-slate-800 hover:bg-slate-750 text-slate-300 font-semibold py-3 px-4 rounded-xl transition-colors border border-slate-700/60">Cancel</button>
                 </div>
             </form>
             <div id="withdrawStatus" class="mt-4 text-center text-sm"></div>
@@ -84,32 +138,34 @@
     </div>
 
     <!-- Send Modal (Wallet-to-Wallet Transfer) -->
-    <div id="sendModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
-            <h3 class="text-xl font-bold mb-4">Send Money</h3>
+    <div id="sendModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <h3 class="text-2xl font-bold text-slate-200 mb-6">Send Money</h3>
             <form id="sendForm" class="space-y-4" onsubmit="sendToUser(event)">
                 <div>
-                    <label class="block text-sm font-medium mb-2">Recipient Email</label>
-                    <input type="email" id="recipientEmail" required class="w-full border rounded-md px-3 py-2">
+                    <label class="block text-sm font-semibold text-slate-400 mb-2">Recipient Email</label>
+                    <input type="email" id="recipientEmail" required class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="recipient@email.com">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-400 mb-2">Currency</label>
+                        <select id="sendCurrency" class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors">
+                            <option value="naira">Naira (₦)</option>
+                            <option value="usd">USD ($)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-400 mb-2">Amount</label>
+                        <input type="number" id="sendAmount" min="1" required class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors">
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-2">Currency</label>
-                    <select id="sendCurrency" class="w-full border rounded-md px-3 py-2">
-                        <option value="naira">Naira</option>
-                        <option value="usd">USD</option>
-                    </select>
+                    <label class="block text-sm font-semibold text-slate-400 mb-2">Wallet PIN</label>
+                    <input type="password" id="sendPin" class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 w-full text-center text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors tracking-widest text-lg" required placeholder="••••">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2">Amount</label>
-                    <input type="number" id="sendAmount" min="1" required class="w-full border rounded-md px-3 py-2">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2">Wallet PIN</label>
-                    <input type="password" id="sendPin" class="w-full border rounded-md px-3 py-2" required>
-                </div>
-                <div class="flex space-x-3">
-                    <button type="submit" class="flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-secondary">Send</button>
-                    <button type="button" onclick="closeSendModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400">Cancel</button>
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-lg shadow-indigo-500/20">Send</button>
+                    <button type="button" onclick="closeSendModal()" class="flex-1 bg-slate-800 hover:bg-slate-750 text-slate-300 font-semibold py-3 px-4 rounded-xl transition-colors border border-slate-700/60">Cancel</button>
                 </div>
             </form>
             <div id="sendStatus" class="mt-4 text-center text-sm"></div>
@@ -117,7 +173,6 @@
     </div>
 
     <script>
-        // --- Helper Functions ---
         function getUsers() {
             return JSON.parse(localStorage.getItem('users') || '[]');
         }
@@ -125,7 +180,7 @@
             return JSON.parse(localStorage.getItem('currentUser') || 'null');
         }
         function isAdmin(user) {
-            return user && user.isAdmin;
+            return user && (user.isAdmin === true || user.email === 'admin@brexbin.com');
         }
         function getWallet(email) {
             return JSON.parse(localStorage.getItem('wallet_' + email) || '{"naira":0,"usd":0,"transactions":[]}');
@@ -144,8 +199,6 @@
             localStorage.setItem('notifications_' + email, JSON.stringify(notifs));
         }
         
-
-        // --- Export Transactions ---
         function exportTransactions() {
             const user = getCurrentUser();
             const wallet = getWallet(user.email);
@@ -162,7 +215,6 @@
             URL.revokeObjectURL(url);
         }
 
-        // --- Send Modal Logic ---
         function showSendModal() {
             document.getElementById('sendModal').classList.remove('hidden');
             document.getElementById('sendModal').classList.add('flex');
@@ -177,13 +229,20 @@
             event.preventDefault();
             const user = getCurrentUser();
             const wallet = getWallet(user.email);
-            const recipient = document.getElementById('recipientEmail').value;
+            const recipient = document.getElementById('recipientEmail').value.trim();
             const currency = document.getElementById('sendCurrency').value;
             const amount = parseFloat(document.getElementById('sendAmount').value);
             const pin = document.getElementById('sendPin').value;
             let status = document.getElementById('sendStatus');
-            if (!recipient || isNaN(amount) || amount <= 0) {
-                status.textContent = "Enter valid recipient and amount.";
+            
+            if (recipient.toLowerCase() === user.email.toLowerCase()) {
+                status.textContent = "You cannot send money to yourself.";
+                status.className = "mt-4 text-center text-sm text-red-500";
+                return;
+            }
+            const allUsers = getUsers();
+            if (!allUsers.some(u => u.email.toLowerCase() === recipient.toLowerCase())) {
+                status.textContent = "Recipient not registered.";
                 status.className = "mt-4 text-center text-sm text-red-500";
                 return;
             }
@@ -197,6 +256,7 @@
                 status.className = "mt-4 text-center text-sm text-red-500";
                 return;
             }
+            
             let recipientWallet = getWallet(recipient);
             wallet[currency] -= amount;
             wallet.transactions.unshift({
@@ -220,84 +280,124 @@
             status.textContent = "Transfer successful!";
             status.className = "mt-4 text-center text-sm text-green-600";
             renderWalletPage();
-            setTimeout(closeSendModal, 2000);
+            setTimeout(closeSendModal, 1500);
         }
 
-        // --- Render Logic ---
         function renderWalletPage() {
             const user = getCurrentUser();
             const walletContent = document.getElementById('walletContent');
             const walletTitle = document.getElementById('walletTitle');
+            const actionButtons = document.getElementById('actionButtons');
+            
             if (!user) {
-                walletTitle.textContent = "Wallet";
-                walletContent.innerHTML = '<div class="text-center mt-20 text-xl text-red-600">Please log in to view your wallet.</div>';
+                walletTitle.textContent = "Wallet Access";
+                walletContent.innerHTML = '<div class="text-center py-20 text-xl text-red-500 font-semibold">Please log in to view your wallet.</div>';
                 return;
             }
+            
             if (isAdmin(user)) {
-                walletTitle.textContent = "All Student Wallets";
+                walletTitle.textContent = "Admin Wallet Hub";
+                actionButtons.innerHTML = '';
                 walletContent.innerHTML = `
-                    <div id="adminWallets"></div>
-                    <h3 class="text-xl font-semibold mt-10 mb-2">Recent Transactions</h3>
-                    <ul id="adminTransactions" class="space-y-2 text-gray-700"></ul>
+                    <div id="adminWallets" class="overflow-x-auto"></div>
+                    <h3 class="text-2xl font-bold text-slate-200 mt-10 mb-4 tracking-tight">Recent System Transactions</h3>
+                    <ul id="adminTransactions" class="space-y-3"></ul>
                 `;
                 renderAdminWallets();
             } else {
-                walletTitle.textContent = "My Wallet";
+                walletTitle.textContent = "My Balance Sheet";
                 const wallet = getWallet(user.email);
+                
+                actionButtons.innerHTML = `
+                    <button onclick="showSendModal()" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md">Send Money</button>
+                    <button onclick="exportTransactions()" class="bg-slate-800 hover:bg-slate-750 text-slate-300 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all border border-slate-700/60">Export History</button>
+                `;
+
                 walletContent.innerHTML = `
-                    <div class="flex items-center justify-between mb-6">
-                        <div>
-                            <div class="text-gray-500">Current Balance</div>
-                            <div id="walletBalance" class="text-3xl font-bold text-green-600">₦${wallet.naira} / $${wallet.usd}</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                        <!-- Naira Card -->
+                        <div class="relative bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 rounded-3xl p-6 shadow-xl border border-indigo-500/20 overflow-hidden text-white group transform hover:scale-[1.01] transition-transform duration-300">
+                            <div class="absolute -right-16 -top-16 w-48 h-48 bg-white/5 rounded-full blur-2xl"></div>
+                            <div class="flex justify-between items-start mb-10">
+                                <div>
+                                    <p class="text-xs tracking-widest text-indigo-200 uppercase font-semibold">Naira Balance</p>
+                                    <h3 class="text-3xl font-extrabold mt-1 tracking-tight">₦${wallet.naira.toLocaleString()}</h3>
+                                </div>
+                                <div class="w-12 h-8 bg-white/10 rounded-lg flex items-center justify-center font-bold text-xs border border-white/20">NGN</div>
+                            </div>
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <p class="text-[10px] tracking-wider text-indigo-300 uppercase">Cardholder</p>
+                                    <p class="text-sm font-semibold tracking-wide">${user.name || user.email.split('@')[0].toUpperCase()}</p>
+                                </div>
+                                <button onclick="showWithdrawModal('${user.email}','naira')" class="bg-white/10 hover:bg-white/20 text-white text-xs px-4 py-2 rounded-xl transition-all border border-white/20">Withdraw</button>
+                            </div>
                         </div>
-                        <div class="flex flex-col sm:flex-row gap-2">
-                            <button onclick="showWithdrawModal('${user.email}','naira')" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-secondary">Withdraw Naira</button>
-                            <button onclick="showWithdrawModal('${user.email}','usd')" class="bg-secondary text-white px-4 py-2 rounded-md hover:bg-primary">Withdraw Dollar</button>
-                            <button onclick="showSendModal()" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Send to User</button>
-                            <button onclick="exportTransactions()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">Export CSV</button>
+
+                        <!-- USD Card -->
+                        <div class="relative bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 rounded-3xl p-6 shadow-xl border border-slate-700/60 overflow-hidden text-white group transform hover:scale-[1.01] transition-transform duration-300">
+                            <div class="absolute -right-16 -top-16 w-48 h-48 bg-white/5 rounded-full blur-2xl"></div>
+                            <div class="flex justify-between items-start mb-10">
+                                <div>
+                                    <p class="text-xs tracking-widest text-slate-400 uppercase font-semibold">USD Balance</p>
+                                    <h3 class="text-3xl font-extrabold mt-1 tracking-tight">$${wallet.usd.toLocaleString()}</h3>
+                                </div>
+                                <div class="w-12 h-8 bg-white/10 rounded-lg flex items-center justify-center font-bold text-xs border border-white/20">USD</div>
+                            </div>
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <p class="text-[10px] tracking-wider text-slate-500 uppercase">Cardholder</p>
+                                    <p class="text-sm font-semibold tracking-wide">${user.name || user.email.split('@')[0].toUpperCase()}</p>
+                                </div>
+                                <button onclick="showWithdrawModal('${user.email}','usd')" class="bg-white/10 hover:bg-white/20 text-white text-xs px-4 py-2 rounded-xl transition-all border border-white/20">Withdraw</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex mb-2 space-x-2">
-                        <input type="text" id="txSearch" placeholder="Search..." class="border px-2 py-1 rounded w-full max-w-xs" oninput="renderStudentTransactions('${user.email}')">
-                        <select id="txTypeFilter" class="border px-2 py-1 rounded" onchange="renderStudentTransactions('${user.email}')">
-                            <option value="">All</option>
-                            <option value="credit">Credit</option>
-                            <option value="debit">Debit</option>
-                        </select>
+
+                    <div class="bg-slate-900/40 rounded-2xl border border-slate-800 p-6">
+                        <div class="flex flex-wrap gap-4 justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold text-slate-200">Transaction Statements</h3>
+                            <div class="flex gap-2">
+                                <input type="text" id="txSearch" placeholder="Search logs..." class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500" oninput="renderStudentTransactions('${user.email}')">
+                                <select id="txTypeFilter" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500" onchange="renderStudentTransactions('${user.email}')">
+                                    <option value="">All Types</option>
+                                    <option value="credit">Credits</option>
+                                    <option value="debit">Debits</option>
+                                </select>
+                            </div>
+                        </div>
+                        <ul id="transactionList" class="space-y-3"></ul>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Transaction History</h3>
-                    <ul id="transactionList" class="space-y-2 text-gray-700"></ul>
                 `;
                 renderStudentTransactions(user.email);
             }
         }
 
-        // --- Admin Wallets ---
         function renderAdminWallets() {
             const users = getUsers().filter(u => !u.isAdmin);
             let html = `
-                <table class="w-full text-left mb-4">
+                <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr>
-                            <th class="py-2">User</th>
-                            <th class="py-2">Naira (₦)</th>
-                            <th class="py-2">USD ($)</th>
-                            <th class="py-2">Actions</th>
+                        <tr class="border-b border-slate-800 text-slate-400 text-sm">
+                            <th class="py-3">User</th>
+                            <th class="py-3">Naira Balance</th>
+                            <th class="py-3">USD Balance</th>
+                            <th class="py-3 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-slate-800/50">
                         ${users.map(u => {
                             const w = getWallet(u.email);
                             return `
                                 <tr>
-                                    <td class="py-2 font-semibold">${u.email}</td>
-                                    <td class="py-2 text-green-600 font-bold">${w.naira}</td>
-                                    <td class="py-2 text-blue-600 font-bold">${w.usd}</td>
-                                    <td class="py-2">
-                                        <button onclick="showTransferModal('${u.email}','naira')" class="bg-primary text-white px-2 py-1 rounded text-xs mr-1">Send ₦</button>
-                                        <button onclick="showTransferModal('${u.email}','usd')" class="bg-secondary text-white px-2 py-1 rounded text-xs mr-1">Send $</button>
-                                        <button onclick="showWithdrawModal('${u.email}','naira')" class="bg-green-500 text-white px-2 py-1 rounded text-xs mr-1">Withdraw ₦</button>
-                                        <button onclick="showWithdrawModal('${u.email}','usd')" class="bg-blue-500 text-white px-2 py-1 rounded text-xs">Withdraw $</button>
+                                    <td class="py-4 font-semibold text-slate-200">${u.email}</td>
+                                    <td class="py-4 text-emerald-400 font-bold">₦${w.naira.toLocaleString()}</td>
+                                    <td class="py-4 text-indigo-400 font-bold">$${w.usd.toLocaleString()}</td>
+                                    <td class="py-4 text-right space-x-1">
+                                        <button onclick="showTransferModal('${u.email}','naira')" class="bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-xs px-2.5 py-1.5 rounded-lg border border-indigo-500/20 transition-all">Send ₦</button>
+                                        <button onclick="showTransferModal('${u.email}','usd')" class="bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-xs px-2.5 py-1.5 rounded-lg border border-purple-500/20 transition-all">Send $</button>
+                                        <button onclick="showWithdrawModal('${u.email}','naira')" class="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs px-2.5 py-1.5 rounded-lg border border-emerald-500/20 transition-all">Debit ₦</button>
+                                        <button onclick="showWithdrawModal('${u.email}','usd')" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs px-2.5 py-1.5 rounded-lg border border-rose-500/20 transition-all">Debit $</button>
                                     </td>
                                 </tr>
                             `;
@@ -307,30 +407,31 @@
             `;
             document.getElementById('adminWallets').innerHTML = html;
 
-            // Render all transactions
             let allTx = [];
             users.forEach(u => {
                 const w = getWallet(u.email);
                 w.transactions.forEach(tx => {
-                    allTx.push({
-                        user: u.email,
-                        ...tx
-                    });
+                    allTx.push({ user: u.email, ...tx });
                 });
             });
             allTx.sort((a, b) => new Date(b.time) - new Date(a.time));
             const txList = document.getElementById('adminTransactions');
             txList.innerHTML = allTx.length ? allTx.slice(0, 10).map(tx => `
-                <li class="flex justify-between items-center bg-gray-100 rounded px-3 py-2">
-                    <span class="font-semibold">${tx.user}</span>
-                    <span>${tx.type === 'credit' ? 'Received' : 'Withdrawn'} ${tx.currency === 'naira' ? '₦' : '$'}${tx.amount}</span>
-                    <span class="${tx.type === 'credit' ? 'text-green-600' : 'text-red-600'}">${tx.type === 'credit' ? '+' : '-'}${tx.currency === 'naira' ? '₦' : '$'}${tx.amount}</span>
-                    <span class="text-xs text-gray-400">${tx.time}</span>
+                <li class="flex justify-between items-center bg-slate-800/40 border border-slate-700/50 rounded-xl px-4 py-3 text-sm">
+                    <div>
+                        <span class="font-semibold text-slate-200">${tx.user}</span>
+                        <p class="text-xs text-slate-500 mt-0.5">${tx.time}</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="${tx.type === 'credit' ? 'text-emerald-400' : 'text-rose-400'} font-bold">
+                            ${tx.type === 'credit' ? '+' : '-'}${tx.currency === 'naira' ? '₦' : '$'}${tx.amount}
+                        </span>
+                        <p class="text-xs text-slate-400 mt-0.5">${tx.details || 'System sync'}</p>
+                    </div>
                 </li>
-            `).join('') : `<li class="text-gray-400">No transactions yet.</li>`;
+            `).join('') : `<li class="text-slate-500 text-center py-6">No system logs yet.</li>`;
         }
 
-        // --- Student Transactions with Filter/Search ---
         function renderStudentTransactions(email) {
             const wallet = getWallet(email);
             const txList = document.getElementById('transactionList');
@@ -344,20 +445,22 @@
                 txs = txs.filter(tx => tx.type === type);
             }
             if (!txs.length) {
-                txList.innerHTML = `<li class="text-gray-400">No transactions yet.</li>`;
+                txList.innerHTML = `<li class="text-slate-500 text-center py-6 text-sm">No transaction records match criteria.</li>`;
             } else {
                 txList.innerHTML = txs.map(tx => `
-                    <li class="flex justify-between items-center bg-gray-100 rounded px-3 py-2">
-                        <span>${tx.type === 'credit' ? 'Received' : 'Withdrawn'} ${tx.currency === 'naira' ? '₦' : '$'}${tx.amount}</span>
-                        <span class="${tx.type === 'credit' ? 'text-green-600' : 'text-red-600'}">${tx.type === 'credit' ? '+' : '-'}${tx.currency === 'naira' ? '₦' : '$'}${tx.amount}</span>
-                        <span class="text-xs text-gray-400">${tx.time}</span>
-                        <span class="text-xs text-gray-500">${tx.details || ''}</span>
+                    <li class="flex justify-between items-center bg-slate-800/30 border border-slate-800/80 rounded-xl px-4 py-3 text-sm hover:border-slate-700 transition-all">
+                        <div>
+                            <span class="font-semibold text-slate-200 capitalize">${tx.type} — ${tx.currency}</span>
+                            <p class="text-xs text-slate-500 mt-0.5">${tx.time} | <span class="italic text-slate-400">${tx.details || ''}</span></p>
+                        </div>
+                        <div class="text-right font-bold text-base ${tx.type === 'credit' ? 'text-emerald-400' : 'text-rose-400'}">
+                            ${tx.type === 'credit' ? '+' : '-'}${tx.currency === 'naira' ? '₦' : '$'}${tx.amount.toLocaleString()}
+                        </div>
                     </li>
                 `).join('');
             }
         }
 
-        // --- Transfer Modal Logic (Admin only) ---
         function showTransferModal(email, currency) {
             document.getElementById('adminTransferModal').classList.remove('hidden');
             document.getElementById('adminTransferModal').classList.add('flex');
@@ -365,7 +468,7 @@
             document.getElementById('transferCurrency').value = currency;
             document.getElementById('transferAmount').value = '';
             document.getElementById('transferStatus').textContent = '';
-            document.getElementById('transferTitle').textContent = `Transfer to ${email} (${currency === 'naira' ? '₦' : '$'})`;
+            document.getElementById('transferTitle').textContent = `Credit to ${email} (${currency === 'naira' ? '₦' : '$'})`;
         }
         function closeTransferModal() {
             document.getElementById('adminTransferModal').classList.add('hidden');
@@ -379,7 +482,7 @@
             let status = document.getElementById('transferStatus');
             if (isNaN(amount) || amount <= 0) {
                 status.textContent = "Enter a valid amount.";
-                status.className = "mt-4 text-center text-sm text-red-500";
+                status.className = "mt-4 text-center text-sm text-rose-400 font-semibold";
                 return;
             }
             let wallet = getWallet(email);
@@ -392,16 +495,15 @@
                 details: `Admin transfer`
             });
             setWallet(email, wallet);
-            addNotification(email, `Admin sent you ${currency === 'naira' ? '₦' : '$'}${amount}.`);
-            status.textContent = `Transfer successful!`;
-            status.className = "mt-4 text-center text-sm text-green-600";
+            addNotification(email, `Admin credited your wallet with ${currency === 'naira' ? '₦' : '$'}${amount.toLocaleString()}.`);
+            status.textContent = `Credit successful!`;
+            status.className = "mt-4 text-center text-sm text-emerald-400 font-semibold";
             setTimeout(() => {
                 closeTransferModal();
                 renderWalletPage();
             }, 1200);
         }
 
-        // --- Withdraw Modal Logic (Both) ---
         function showWithdrawModal(email, currency) {
             document.getElementById('withdrawModal').classList.remove('hidden');
             document.getElementById('withdrawModal').classList.add('flex');
@@ -435,30 +537,30 @@
             const user = getCurrentUser();
             if (pin !== user.pin) {
                 status.textContent = "Incorrect PIN.";
-                status.className = "mt-4 text-center text-sm text-red-500";
+                status.className = "mt-4 text-center text-sm text-rose-400 font-semibold";
                 return;
             }
             if (isNaN(amount) || amount <= 0) {
                 status.textContent = "Enter a valid amount.";
-                status.className = "mt-4 text-center text-sm text-red-500";
+                status.className = "mt-4 text-center text-sm text-rose-400 font-semibold";
                 return;
             }
             if (currency === 'naira') {
                 if (amount > wallet.naira) {
                     status.textContent = "Insufficient Naira balance.";
-                    status.className = "mt-4 text-center text-sm text-red-500";
+                    status.className = "mt-4 text-center text-sm text-rose-400 font-semibold";
                     return;
                 }
                 const bank = document.getElementById('nairaBank').value;
                 const acct = document.getElementById('nairaAccount').value;
                 if (!bank) {
                     status.textContent = "Please select a bank.";
-                    status.className = "mt-4 text-center text-sm text-red-500";
+                    status.className = "mt-4 text-center text-sm text-rose-400 font-semibold";
                     return;
                 }
                 if (!acct) {
-                    status.textContent = "Please enter Naira account number.";
-                    status.className = "mt-4 text-center text-sm text-red-500";
+                    status.textContent = "Please enter account number.";
+                    status.className = "mt-4 text-center text-sm text-rose-400 font-semibold";
                     return;
                 }
                 wallet.naira -= amount;
@@ -467,23 +569,22 @@
                     currency: 'naira',
                     amount,
                     time: new Date().toLocaleString(),
-                    details: `Withdrawn to ${bank} account ${acct}`,
-                    status: 'pending'
+                    details: `Withdrawn to ${bank} account ${acct}`
                 });
                 setWallet(email, wallet);
-                addNotification(email, `Withdrawal of ₦${amount} requested to ${bank} account ${acct}.`);
-                status.textContent = `Withdrawal request sent for ₦${amount} to ${bank} account ${acct}.`;
-                status.className = "mt-4 text-center text-sm text-green-600";
+                addNotification(email, `Withdrew ₦${amount.toLocaleString()} to ${bank} account ${acct}.`);
+                status.textContent = `Withdrawal of ₦${amount.toLocaleString()} completed.`;
+                status.className = "mt-4 text-center text-sm text-emerald-400 font-semibold";
             } else {
                 if (amount > wallet.usd) {
                     status.textContent = "Insufficient Dollar balance.";
-                    status.className = "mt-4 text-center text-sm text-red-500";
+                    status.className = "mt-4 text-center text-sm text-rose-400 font-semibold";
                     return;
                 }
                 const paypal = document.getElementById('paypalEmail').value;
                 if (!paypal) {
                     status.textContent = "Please enter PayPal email.";
-                    status.className = "mt-4 text-center text-sm text-red-500";
+                    status.className = "mt-4 text-center text-sm text-rose-400 font-semibold";
                     return;
                 }
                 wallet.usd -= amount;
@@ -492,16 +593,15 @@
                     currency: 'usd',
                     amount,
                     time: new Date().toLocaleString(),
-                    details: `Withdrawn to PayPal ${paypal}`,
-                    status: 'pending'
+                    details: `Withdrawn to PayPal (${paypal})`
                 });
                 setWallet(email, wallet);
-                addNotification(email, `Withdrawal of $${amount} requested to PayPal ${paypal}.`);
-                status.textContent = `Withdrawal request sent for $${amount} to PayPal ${paypal}.`;
-                status.className = "mt-4 text-center text-sm text-green-600";
+                addNotification(email, `Withdrew $${amount.toLocaleString()} to PayPal ${paypal}.`);
+                status.textContent = `Withdrawal of $${amount.toLocaleString()} completed.`;
+                status.className = "mt-4 text-center text-sm text-emerald-400 font-semibold";
             }
             renderWalletPage();
-            setTimeout(closeWithdrawModal, 2000);
+            setTimeout(closeWithdrawModal, 1500);
         }
 
         window.addEventListener('DOMContentLoaded', renderWalletPage);
