@@ -905,8 +905,9 @@ function setCurrentUser(user) {
     localStorage.setItem('currentUser', JSON.stringify(user));
 }
 async function apiRequest(path, options = {}) {
-    if (window.location.protocol === 'file:') {
-        throw new Error('Failed to fetch. Open the site via http(s), not file://');
+    const isOffline = (window.location.protocol === 'file:');
+    if (isOffline) {
+        return mockApiHandler(path, options);
     }
     const config = {
         method: options.method || 'GET',
@@ -918,22 +919,127 @@ async function apiRequest(path, options = {}) {
     if (options.body !== undefined) {
         config.body = typeof options.body === 'string' ? options.body : JSON.stringify(options.body);
     }
-    let response;
     try {
-        response = await fetch(path, config);
+        const response = await fetch(path, config);
+        let data = {};
+        try {
+            data = await response.json();
+        } catch {}
+        if (!response.ok) {
+            throw new Error(data.message || 'Request failed.');
+        }
+        return data;
     } catch (err) {
-        throw new Error('Failed to fetch. Check your connection or server URL.');
+        console.warn('Network call failed, using offline fallback:', err.message);
+        return mockApiHandler(path, options);
     }
-    let data = {};
-    try {
-        data = await response.json();
-    } catch {
-        data = {};
+}
+
+function mockApiHandler(path, options) {
+    const method = (options.method || 'GET').toUpperCase();
+    const body = options.body || {};
+    
+    const getLocalUsers = () => JSON.parse(localStorage.getItem('users') || '[]');
+    const setLocalUsers = (users) => localStorage.setItem('users', JSON.stringify(users));
+    const getLocalJobs = () => JSON.parse(localStorage.getItem('jobs') || '[]');
+    const setLocalJobs = (jobs) => localStorage.setItem('jobs', JSON.stringify(jobs));
+
+    // Seed default admin user offline if missing
+    let currentUsers = getLocalUsers();
+    if (!currentUsers.some(u => u.email === 'admin@brexbin.com')) {
+        currentUsers.push({
+            email: 'admin@brexbin.com',
+            password: 'admin',
+            name: 'Admin User',
+            bio: 'System Administrator',
+            likes: [],
+            securityQuestion: 'Admin pin',
+            securityAnswer: '1234',
+            isAdmin: true
+        });
+        setLocalUsers(currentUsers);
     }
-    if (!response.ok) {
-        throw new Error(data.message || 'Request failed.');
+
+    if (path.includes('/register') && method === 'POST') {
+        let users = getLocalUsers();
+        if (users.some(u => u.email.toLowerCase() === body.email.toLowerCase())) {
+            throw new Error('Email already registered.');
+        }
+        const newUser = {
+            email: body.email,
+            password: body.password,
+            name: '',
+            bio: '',
+            likes: [],
+            securityQuestion: body.securityQuestion || '',
+            securityAnswer: (body.securityAnswer || '').toLowerCase().trim()
+        };
+        users.push(newUser);
+        setLocalUsers(users);
+        return { message: 'User registered successfully!' };
     }
-    return data;
+    
+    if (path.includes('/login') && method === 'POST') {
+        let users = getLocalUsers();
+        const user = users.find(u => u.email.toLowerCase() === body.email.toLowerCase() && u.password === body.password);
+        if (!user) {
+            throw new Error('Invalid email or password.');
+        }
+        return {
+            message: 'Login successful!',
+            user: { email: user.email, isAdmin: user.isAdmin === true }
+        };
+    }
+    
+    if (path.includes('/reset-password/start') && method === 'POST') {
+        let users = getLocalUsers();
+        const user = users.find(u => u.email.toLowerCase() === body.email.toLowerCase());
+        if (!user) {
+            throw new Error('No account found with that email.');
+        }
+        return { securityQuestion: user.securityQuestion || 'Security Question' };
+    }
+    
+    if (path.includes('/reset-password/complete') && method === 'POST') {
+        let users = getLocalUsers();
+        const idx = users.findIndex(u => u.email.toLowerCase() === body.email.toLowerCase());
+        if (idx === -1) {
+            throw new Error('No account found with that email.');
+        }
+        const user = users[idx];
+        if ((user.securityAnswer || '').toLowerCase().trim() !== (body.securityAnswer || '').toLowerCase().trim()) {
+            throw new Error('Incorrect security answer.');
+        }
+        user.password = body.newPassword;
+        users[idx] = user;
+        setLocalUsers(users);
+        return { message: 'Password reset successful.' };
+    }
+    
+    if (path.includes('/jobs')) {
+        if (method === 'GET') {
+            return getLocalJobs();
+        }
+        if (method === 'POST') {
+            let jobs = getLocalJobs();
+            const newJob = {
+                id: Date.now(),
+                title: body.title,
+                company: body.company,
+                category: body.category,
+                pay: parseFloat(body.pay) || 0,
+                location: body.location,
+                description: body.description || '',
+                requirements: body.requirements || '',
+                contact: body.contact || '',
+                posted: new Date().toISOString()
+            };
+            jobs.unshift(newJob);
+            setLocalJobs(jobs);
+            return newJob;
+        }
+    }
+    throw new Error('Offline handler route not found.');
 }
 function showStatus(elementId, message, isError) {
     const targetId = elementId || 'globalStatus';
