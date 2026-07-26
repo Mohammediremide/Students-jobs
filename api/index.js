@@ -47,9 +47,9 @@ const pool = {
     if (normalized.includes('select count(*)::int as count from jobs')) {
       return { rows: [{ count: mockJobs.length }] };
     }
-    if (normalized.includes('select id from users where email = $1')) {
-      const email = params[0];
-      return { rows: mockUsers.filter(u => u.email === email) };
+    if (normalized.includes('select id from users where')) {
+      const email = (params[0] || '').toLowerCase();
+      return { rows: mockUsers.filter(u => (u.email || '').toLowerCase() === email) };
     }
     if (normalized.includes('insert into users')) {
       const [email, password_hash, security_question, security_answer, is_admin] = params;
@@ -65,17 +65,17 @@ const pool = {
       mockUsers.push(newUser);
       return { rows: [newUser] };
     }
-    if (normalized.includes('select id, email, password_hash, is_admin from users where email = $1')) {
-      const email = params[0];
-      return { rows: mockUsers.filter(u => u.email === email) };
+    if (normalized.includes('select id, email, password_hash, is_admin from users')) {
+      const email = (params[0] || '').toLowerCase();
+      return { rows: mockUsers.filter(u => (u.email || '').toLowerCase() === email) };
     }
-    if (normalized.includes('select security_question from users where email = $1')) {
-      const email = params[0];
-      return { rows: mockUsers.filter(u => u.email === email).map(u => ({ security_question: u.security_question })) };
+    if (normalized.includes('select security_question from users')) {
+      const email = (params[0] || '').toLowerCase();
+      return { rows: mockUsers.filter(u => (u.email || '').toLowerCase() === email).map(u => ({ security_question: u.security_question })) };
     }
-    if (normalized.includes('select id, security_answer from users where email = $1')) {
-      const email = params[0];
-      return { rows: mockUsers.filter(u => u.email === email).map(u => ({ id: u.id, security_answer: u.security_answer })) };
+    if (normalized.includes('select id, security_answer from users')) {
+      const email = (params[0] || '').toLowerCase();
+      return { rows: mockUsers.filter(u => (u.email || '').toLowerCase() === email).map(u => ({ id: u.id, security_answer: u.security_answer })) };
     }
     if (normalized.includes('update users set password_hash = $1 where id = $2')) {
       const [hash, id] = params;
@@ -275,23 +275,24 @@ async function seedJobsIfEmpty() {
 }
 
 app.post('/register', async (req, res) => {
-  const { email, password, securityQuestion, securityAnswer } = req.body;
+  const { email, password, securityQuestion, securityAnswer } = req.body || {};
   if (!email || !password) {
     return res.status(400).json({ message: 'Email and password are required.' });
   }
   try {
     await initDb();
-    const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    const existing = await pool.query('SELECT id FROM users WHERE LOWER(email) = LOWER($1)', [email]);
     if (existing.rows.length > 0) {
       return res.status(409).json({ message: 'Email already taken.' });
     }
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
-    const isAdmin = email === 'admin@brexbin.com';
+    const isAdmin = email.toLowerCase() === 'admin@brexbin.com';
+    const cleanAnswer = securityAnswer ? securityAnswer.toLowerCase().trim() : null;
     await pool.query(
       `INSERT INTO users (email, password_hash, security_question, security_answer, is_admin)
        VALUES ($1, $2, $3, $4, $5)`,
-      [email, passwordHash, securityQuestion || null, securityAnswer || null, isAdmin]
+      [email, passwordHash, securityQuestion || null, cleanAnswer, isAdmin]
     );
     res.status(201).json({ message: 'User registered successfully!' });
   } catch (error) {
@@ -301,14 +302,14 @@ app.post('/register', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } = req.body || {};
   if (!email || !password) {
     return res.status(400).json({ message: 'Email and password are required.' });
   }
   try {
     await initDb();
     const { rows } = await pool.query(
-      'SELECT id, email, password_hash, is_admin FROM users WHERE email = $1',
+      'SELECT id, email, password_hash, is_admin FROM users WHERE LOWER(email) = LOWER($1)',
       [email]
     );
     const user = rows[0];
@@ -338,7 +339,7 @@ app.post('/reset-password/start', async (req, res) => {
   try {
     await initDb();
     const { rows } = await pool.query(
-      'SELECT security_question FROM users WHERE email = $1',
+      'SELECT security_question FROM users WHERE LOWER(email) = LOWER($1)',
       [email]
     );
     const user = rows[0];
@@ -360,7 +361,7 @@ app.post('/reset-password/complete', async (req, res) => {
   try {
     await initDb();
     const { rows } = await pool.query(
-      'SELECT id, security_answer FROM users WHERE email = $1',
+      'SELECT id, security_answer FROM users WHERE LOWER(email) = LOWER($1)',
       [email]
     );
     const user = rows[0];

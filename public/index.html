@@ -919,25 +919,30 @@ async function apiRequest(path, options = {}) {
     if (options.body !== undefined) {
         config.body = typeof options.body === 'string' ? options.body : JSON.stringify(options.body);
     }
+    let response;
     try {
-        const response = await fetch(path, config);
-        let data = {};
-        try {
-            data = await response.json();
-        } catch {}
-        if (!response.ok) {
-            throw new Error(data.message || 'Request failed.');
-        }
-        return data;
+        response = await fetch(path, config);
     } catch (err) {
         console.warn('Network call failed, using offline fallback:', err.message);
         return mockApiHandler(path, options);
     }
+
+    let data = {};
+    try {
+        data = await response.json();
+    } catch {}
+    if (!response.ok) {
+        throw new Error(data.message || 'Request failed.');
+    }
+    return data;
 }
 
-function mockApiHandler(path, options) {
+function mockApiHandler(path, options = {}) {
     const method = (options.method || 'GET').toUpperCase();
-    const body = options.body || {};
+    let body = options.body || {};
+    if (typeof body === 'string') {
+        try { body = JSON.parse(body); } catch {}
+    }
     
     const getLocalUsers = () => JSON.parse(localStorage.getItem('users') || '[]');
     const setLocalUsers = (users) => localStorage.setItem('users', JSON.stringify(users));
@@ -946,7 +951,7 @@ function mockApiHandler(path, options) {
 
     // Seed default admin user offline if missing
     let currentUsers = getLocalUsers();
-    if (!currentUsers.some(u => u.email === 'admin@brexbin.com')) {
+    if (!currentUsers.some(u => (u.email || '').toLowerCase() === 'admin@brexbin.com')) {
         currentUsers.push({
             email: 'admin@brexbin.com',
             password: 'admin',
@@ -960,13 +965,18 @@ function mockApiHandler(path, options) {
         setLocalUsers(currentUsers);
     }
 
+    const inputEmail = (body.email || '').trim().toLowerCase();
+
     if (path.includes('/register') && method === 'POST') {
         let users = getLocalUsers();
-        if (users.some(u => u.email.toLowerCase() === body.email.toLowerCase())) {
+        if (!inputEmail || !body.password) {
+            throw new Error('Email and password are required.');
+        }
+        if (users.some(u => (u.email || '').toLowerCase() === inputEmail)) {
             throw new Error('Email already registered.');
         }
         const newUser = {
-            email: body.email,
+            email: body.email.trim(),
             password: body.password,
             name: '',
             bio: '',
@@ -981,7 +991,10 @@ function mockApiHandler(path, options) {
     
     if (path.includes('/login') && method === 'POST') {
         let users = getLocalUsers();
-        const user = users.find(u => u.email.toLowerCase() === body.email.toLowerCase() && u.password === body.password);
+        if (!inputEmail || !body.password) {
+            throw new Error('Email and password are required.');
+        }
+        const user = users.find(u => (u.email || '').toLowerCase() === inputEmail && u.password === body.password);
         if (!user) {
             throw new Error('Invalid email or password.');
         }
@@ -993,7 +1006,10 @@ function mockApiHandler(path, options) {
     
     if (path.includes('/reset-password/start') && method === 'POST') {
         let users = getLocalUsers();
-        const user = users.find(u => u.email.toLowerCase() === body.email.toLowerCase());
+        if (!inputEmail) {
+            throw new Error('Email is required.');
+        }
+        const user = users.find(u => (u.email || '').toLowerCase() === inputEmail);
         if (!user) {
             throw new Error('No account found with that email.');
         }
@@ -1002,12 +1018,14 @@ function mockApiHandler(path, options) {
     
     if (path.includes('/reset-password/complete') && method === 'POST') {
         let users = getLocalUsers();
-        const idx = users.findIndex(u => u.email.toLowerCase() === body.email.toLowerCase());
+        const inputAnswer = (body.securityAnswer || '').toLowerCase().trim();
+        const idx = users.findIndex(u => (u.email || '').toLowerCase() === inputEmail);
         if (idx === -1) {
             throw new Error('No account found with that email.');
         }
         const user = users[idx];
-        if ((user.securityAnswer || '').toLowerCase().trim() !== (body.securityAnswer || '').toLowerCase().trim()) {
+        const expectedAnswer = (user.securityAnswer || '').toLowerCase().trim();
+        if (expectedAnswer && expectedAnswer !== inputAnswer) {
             throw new Error('Incorrect security answer.');
         }
         user.password = body.newPassword;
@@ -1165,23 +1183,28 @@ async function signup(event) {
     const password = document.getElementById('signupPassword').value;
     const securityQuestion = document.getElementById('signupSecurityQuestion').value.trim();
     const securityAnswer = document.getElementById('signupSecurityAnswer').value.trim().toLowerCase();
-    let users = getUsers();
-    if (users.find(u => u.email === email)) {
-        showStatus('signupStatus', 'Email already registered.', true);
+    
+    if (!email || !password) {
+        showStatus('signupStatus', 'Email and password are required.', true);
         return;
     }
+    
     try {
         await apiRequest('/register', {
             method: 'POST',
             body: { email, password, securityQuestion, securityAnswer }
         });
         const user = { email, password, name: '', bio: '', likes: [], securityQuestion, securityAnswer };
-        if (email === "admin@brexbin.com") user.isAdmin = true;
-        users.push(user);
-        setUsers(users);
+        if (email.toLowerCase() === "admin@brexbin.com") user.isAdmin = true;
+        let users = getUsers();
+        if (!users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+            users.push(user);
+            setUsers(users);
+        }
         setCurrentUser(user);
         showStatus('signupStatus', 'Signup successful! Please complete your profile.', false);
         showSection('profile');
+        updateNavVisibility();
     } catch (error) {
         showStatus('signupStatus', error.message, true);
     }
@@ -1192,13 +1215,19 @@ async function login(event) {
     event.preventDefault();
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
+    
+    if (!email || !password) {
+        showStatus('loginStatus', 'Email and password are required.', true);
+        return;
+    }
+    
     try {
         const result = await apiRequest('/login', {
             method: 'POST',
             body: { email, password }
         });
         let users = getUsers();
-        let user = users.find(u => u.email === email);
+        let user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
         if (!user) {
             user = { email, password, name: '', bio: '', likes: [] };
             users.push(user);
@@ -1206,7 +1235,8 @@ async function login(event) {
         user.isAdmin = result.user && result.user.isAdmin === true;
         setUsers(users);
         setCurrentUser(user);
-        showSection('profile');
+        showProfile();
+        updateNavVisibility();
     } catch (error) {
         showStatus('loginStatus', error.message, true);
     }
@@ -1543,30 +1573,7 @@ function setNotifications(notifs) {
         }
         
 
-     
-        async function login(event) {
-            event.preventDefault();
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            try {
-                const result = await apiRequest('/login', {
-                    method: 'POST',
-                    body: { email, password }
-                });
-                let users = getUsers();
-                let user = users.find(u => u.email === email);
-                if (!user) {
-                    user = { email, password, name: '', bio: '', likes: [] };
-                    users.push(user);
-                }
-                user.isAdmin = result.user && result.user.isAdmin === true;
-                setUsers(users);
-                setCurrentUser(user);
-                showProfile();
-            } catch (error) {
-                showStatus('loginStatus', error.message, true);
-            }
-        }
+
 
         function showSection(section) {
             document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
@@ -2332,31 +2339,7 @@ function updateNavVisibility() {
 }
 
 
-async function login(event) {
-    event.preventDefault();
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    try {
-        const result = await apiRequest('/login', {
-            method: 'POST',
-            body: { email, password }
-        });
-        let users = getUsers();
-        let user = users.find(u => u.email === email);
-        if (!user) {
-            user = { email, password, name: '', bio: '', likes: [] };
-            users.push(user);
-        }
-        user.isAdmin = result.user && result.user.isAdmin === true;
-        setUsers(users);
-        setCurrentUser(user);
-        showProfile();
-        updateNavVisibility();
-        document.dispatchEvent(new Event('DOMContentLoaded')); 
-    } catch (error) {
-        showStatus('loginStatus', error.message, true);
-    }
-}
+
 
 function logoutProfile() {
     localStorage.removeItem('currentUser');
